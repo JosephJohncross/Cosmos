@@ -13,9 +13,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-      define: {
-        global: 'globalThis',
-      },
+      // define: {
+      //   global: 'globalThis',
+      // },
       plugins: [
         NodeGlobalsPolyfillPlugin({
           process: true,
