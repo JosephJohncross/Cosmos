@@ -5,10 +5,10 @@ import WalletConnection from "./wallet-connect"
 const HeaderEnd = () => {
     return (
         <>
-            <WalletConnection />
-            {/* <Link to={}>
-                <Button className="bg-primary rounded-md py-4 px-6 font-circular text-white font-medium">Connect Wallet</Button>
+{/*             <WalletConnection /> */}
+{/*             <Link to={}>
             </Link> */}
+                <Button className="bg-primary rounded-md py-4 px-6 font-circular text-white font-medium">Connect Wallet</Button>
         </>
     )
 }
