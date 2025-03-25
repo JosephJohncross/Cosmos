@@ -1,0 +1,250 @@
+@import url('../../../public/fonts/circular/stylesheet.css');
+
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
+  @layer base {
+    :root {
+      --background: 240 5% 96%; /* New background color */
+      --foreground: 224 71.4% 4.1%;
+      
+      --card: 240 5% 96%;
+      --card-foreground: 224 71.4% 4.1%;
+  
+      --popover: 240 5% 96%;
+      --popover-foreground: 224 71.4% 4.1%;
+  
+      --primary: 214 82% 51%; /* Updated primary color */
+      --primary-foreground: 210 20% 98%;
+  
+      --secondary: 214 72% 35%; /* Darker shade of primary */
+      --secondary-foreground: 210 20% 98%;
+  
+      --muted: 214 20% 92%; /* Lighter version for subtle elements */
+      --muted-foreground: 214 20% 40%;
+  
+      --accent: 214 72% 42%;
+      --accent-foreground: 210 20% 98%;
+  
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 20% 98%;
+  
+      --border: 214 15% 85%; /* Light border for better contrast */
+      --input: 214 15% 85%;
+  
+      --radius: 0.5rem;
+    }
+  
+    .dark {
+      --background: 224 71.4% 4.1%;
+      --foreground: 210 20% 98%;
+  
+      --card: 224 71.4% 4.1%;
+      --card-foreground: 210 20% 98%;
+  
+      --popover: 224 71.4% 4.1%;
+      --popover-foreground: 210 20% 98%;
+  
+      --primary: 214 82% 51%; /* Keep primary color consistent */
+      --primary-foreground: 210 20% 98%;
+  
+      --secondary: 214 72% 40%; /* Darker shade */
+      --secondary-foreground: 210 20% 98%;
+  
+      --muted: 215 27.9% 16.9%;
+      --muted-foreground: 217.9 10.6% 64.9%;
+  
+      --accent: 215 27.9% 20%;
+      --accent-foreground: 210 20% 98%;
+  
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 20% 98%;
+  
+      --border: 215 27.9% 25%;
+      --input: 215 27.9% 25%;
+    }
+
+    * {
+      @apply border-border;
+    }
+    body {
+      @apply bg-background text-foreground;
+    }
+    body {
+      font-family: 'Circular Std', sans-serif !important;
+    }
+
+  }
+
+@layer components {
+  .app-container {
+    @apply mx-auto w-full max-w-screen-2xl px-5 ipad:px-12 mini:px-16;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px; /* Set the width of the scroll bar */
+    height: 9px; /* Set the height of the horizontal scroll bar */
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent; /* Color of the scrollbar track */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 50px; /* Rounded corners for the thumb */
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar thumb on hover */
+  }
+  
+  /* Firefox */
+  html {
+    scrollbar-width: thin; /* Width of the scrollbar */
+    scrollbar-color: #2040A8 #f1f1f1; /* Color of the thumb and track */
+  }
+  
+  /* Custom class for specific element */
+  .custom-scroll-visible {
+    scrollbar-width: thin;
+    scrollbar-color: #2040A8 #f1f1f1;
+  }
+  
+  .custom-scroll-visible::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  
+  .custom-scroll-visible::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scroll-visible::-webkit-scrollbar-thumb {
+    background: #2040A8;
+    border-radius: 100px;
+  }
+  
+  .custom-scroll-visible::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: none;
+    scrollbar-color: unset;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 0px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 0px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+  }
+}
+
+  .container{
+    position: relative;
+    width: 100%;
+  }
+  .navigation{
+      position: fixed;
+      width: 300px;
+      height: 100%;
+      /* background: transparent; */
+      transition: 0.5s;
+      overflow: hidden;
+      box-shadow: 10px 0 15px rgba(0, 0, 0, 0.3);
+  }
+  .navigation.active .hide-text {
+    @apply opacity-0 transition-opacity hidden
+  }
+  .navigation.active{
+    @apply w-[100px]
+  }
+
+  .navigation.active ul{
+    @apply px-3
+  }
+
+  .navigation.active .logo{
+    @apply px-3
+  }
+
+  .navigation ul li{
+      position: relative;
+      width: 100%;
+      list-style: none;
+  }
+
+  .navigation.active a {
+    @apply w-max ml-2
+  }
+
+  /* ----main----- */
+  .main{
+      position: absolute;
+      width: calc(100% - 300px);
+      left: 300px;
+      background: transparent;
+      min-height: 100vh;
+      transition: 0.5s;
+  }
+  .main.active{
+      width: calc(100% - 100px);
+      left: 100px;
+  }
+
+  /*Media query for responsiveness*/
+  @media screen and (max-width: 1200px) {
+      .navigation{
+          left: -300px;
+      }
+      .navigation.active{
+          left: 0;
+      }
+      .main{
+          width: 100%;
+          left: 0;
+      }
+      .main.active{
+          width: calc(100% - 60px);
+          left: 60px;
+      }
+  }
+
+  @media screen and (max-width: 480px){
+      .navigation{
+          width: 100%;
+          z-index: 1000;
+          left: -100%;
+      }
+      .navigation.active{
+          width: 100%;
+          left: 0;
+      }
+      .main,
+      .main.active{
+          width: 100%;
+          overflow: hidden;
+          left: 0;
+      }
+  }
+
+  .service-gradient{
+    background: linear-gradient(90deg, #f4f4f5, #f4f4f5 80%, #fff);
+    border: 1px solid #e4e4e7;
+    overflow: hidden;
+  }
