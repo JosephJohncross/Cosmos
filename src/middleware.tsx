@@ -4,7 +4,7 @@ import { ApplicationRoutes } from "./routes/routes-constant"
 import { useAuth } from "./context/auth-context"
 
 export const privateRoutes: string[] = [
-    ApplicationRoutes.DASHBOARD,
+    // ApplicationRoutes.DASHBOARD,
 ]
 
 const isPrivateRoute = (path: string) => {

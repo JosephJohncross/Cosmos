@@ -20,7 +20,7 @@ const routesWithFooter = [
 ]
   
 
-const hasFooter = (path:string) => {
+export const hasFooter = (path:string) => {
     return routesWithFooter.some((route) => matchPath(route, path))
 }
 
