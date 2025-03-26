@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom"
 import { Button } from "../ui/button"
-import WalletConnection from "./wallet-connect"
+// import WalletConnection from "./wallet-connect"
 import { ApplicationRoutes } from "../../routes/routes-constant"
 const HeaderEnd = () => {
     return (
