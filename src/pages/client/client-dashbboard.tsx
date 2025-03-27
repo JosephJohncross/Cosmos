@@ -4,6 +4,8 @@ import NotificationCard from "../../components/freelancer/notification-card"
 import NoPostIcon from "../../components/icons/client/no-post-icon"
 import { LucidePlus } from "lucide-react"
 import ExpertCard, { ExpertCardType } from "../../components/client/expert-card"
+import { Link } from "react-router-dom"
+import { ApplicationRoutes } from "../../routes/routes-constant"
 
 const dummyClient: ExpertCardType[] = [
     {
@@ -58,12 +60,12 @@ const ClientDashboard  = () => {
 
                                 <p className="text-[#545756] my-9">No active job posts or contracts at the moment.</p>
 
-                                <div className="">
+                                <Link to={ApplicationRoutes.POST_A_JOB} className="">
                                     <Button className="flex items-center text-primary bg-white space-x-3 border border-primary rounded-md hover:bg-white focus:bg-white">
                                         <LucidePlus size={19}/>
                                         <p className="font-medium text-base">Post a project</p>
                                     </Button>
-                                </div>
+                                </Link>
                             </div>
                         </div>
 

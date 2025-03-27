@@ -1,19 +1,15 @@
-import { useEffect, useRef, useState } from "react"
-import PencilEdit from "../../icons/freelance/pencil-edit"
-import { Button } from "../../ui/button"
+import { useEffect, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from "../../../components/ui/dialog"
-import UploadSuccess from "../../icons/freelance/upload-success"
+    DialogTrigger
+} from "../../../components/ui/dialog"
 import { useAuth } from "../../../context/auth-context"
-import { useNavigate } from "react-router-dom"
 import { ApplicationRoutes } from "../../../routes/routes-constant"
+import PencilEdit from "../../icons/freelance/pencil-edit"
+import UploadSuccess from "../../icons/freelance/upload-success"
+import { Button } from "../../ui/button"
 
 type SubmitDetailsProps = {
     setActiveStep: React.Dispatch<React.SetStateAction<number>>
