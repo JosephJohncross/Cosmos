@@ -13,7 +13,7 @@ type AuthProviderProps = {
 export const AuthContext = createContext<AuthContextProps | null>(null);
 
 const AuthProvider = ({children}: AuthProviderProps) => {
-    const [isNewFreelanceUser, setIsNewFreelanceUser] = useState(false)
+    const [isNewFreelanceUser, setIsNewFreelanceUser] = useState(true)
 
     return (
         <AuthContext.Provider value={

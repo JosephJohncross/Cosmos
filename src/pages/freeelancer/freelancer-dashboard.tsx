@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react"
 import { useFreelancer } from "../../context/freelancer-context"
 import { ApplicationRoutes } from "../../routes/routes-constant"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/auth-context"
 import { LucideMoveLeft, LucideMoveUpRight, LucideSearch } from "lucide-react"
 import { Input } from "../../components/ui/input"
@@ -173,7 +173,7 @@ const FreelancerDasboard  = () => {
 
             <Sheet>
                 <SheetTrigger asChild>
-                    <div ref={jobDetailsBtn} className="">Open</div>
+                    <div ref={jobDetailsBtn} className="hidden">Open</div>
                 </SheetTrigger>
                 
                 <SheetContent side="bottom" className="h-[90vh] custom-scrollbar max-w-screen-lg  mx-auto rounded-2xl mb-10 bg-white font-circular">
@@ -182,11 +182,13 @@ const FreelancerDasboard  = () => {
                     </SheetHeader>
 
                     <div className="w-full px-5">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between pb-2">
                             <SheetClose>
                                 <LucideMoveLeft size={20}/>
                             </SheetClose>
-                            <Button className="text-white bg-primary rounded-md font-circular">Apply for job</Button>
+                            <Link to={ApplicationRoutes.JOB_APPLY}>
+                                <Button className="text-white bg-primary rounded-md font-circular">Apply for job</Button>
+                            </Link>
                         </div>
 
                         <div className="font-circular h-[70vh] overflow-auto custom-scrollbar">
