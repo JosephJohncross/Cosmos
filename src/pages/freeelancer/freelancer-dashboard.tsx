@@ -23,6 +23,15 @@ import {
   } from "../../components/ui/sheet"
 import FreelancCalendar from "../../components/icons/freelance/freelance-calendar"
 import LocationIcon from "../../components/icons/freelance/location-icon"
+import ApplicantIcon from "../../components/icons/freelance/applicant-icon"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogTrigger
+} from "../../components/ui/dialog"
+import TerminateContract from "../../components/icons/freelance/terminate-contract"
+import AcceptPayment from "../../components/icons/freelance/accept-payment"
 
 const dummyPostings: ProjectListingComponentType[] = [
     {
@@ -80,6 +89,8 @@ const FreelancerDasboard  = () => {
     const {isNewFreelanceUser} = useAuth()
     const navigate = useNavigate();
     const jobDetailsBtn = useRef<HTMLDivElement>(null)
+    const acceptPayModal = useRef<HTMLDivElement>(null)
+    const terminateModal = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         isNewFreelanceUser ? navigate(ApplicationRoutes.FREELANCER_SETUP) : ""
@@ -130,7 +141,10 @@ const FreelancerDasboard  = () => {
                                     <p className="text-sm mt-1 text-[#7E8082] font-normal">You don’t have any active jobs right now</p>
                                 </div> */}
                                 <div className="">
-                                    <ActiveJobCard/>
+                                    <ActiveJobCard
+                                        acceptPayModal={acceptPayModal}
+                                        terminateContract={terminateModal}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -244,13 +258,7 @@ const FreelancerDasboard  = () => {
 
                                     <div className="font-circular text-sm font-normal mt-5 flex flex-col gap-y-2">
                                         <div className="flex items-center space-x-2">
-                                            <svg className="scale-90" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M13.5 1.5V3M4.5 1.5V3" stroke="#545756" stroke-width="1.125" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <path d="M8.99662 9.75H9.00338M8.99662 12.75H9.00338M11.9933 9.75H12M6 9.75H6.00673M6 12.75H6.00673" stroke="#545756" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <path d="M2.625 6H15.375" stroke="#545756" stroke-width="1.125" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <path d="M1.875 9.1824C1.875 5.91446 1.875 4.28046 2.81409 3.26523C3.75318 2.25 5.26462 2.25 8.2875 2.25H9.7125C12.7354 2.25 14.2469 2.25 15.1859 3.26523C16.125 4.28046 16.125 5.91446 16.125 9.1824V9.5676C16.125 12.8356 16.125 14.4695 15.1859 15.4848C14.2469 16.5 12.7354 16.5 9.7125 16.5H8.2875C5.26462 16.5 3.75318 16.5 2.81409 15.4848C1.875 14.4695 1.875 12.8356 1.875 9.5676V9.1824Z" stroke="#545756" stroke-width="1.125" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <path d="M2.25 6H15.75" stroke="#545756" stroke-width="1.125" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
+                                            <ApplicantIcon/>
 
                                             <p className="text-[#7E8082]">Applicants</p>
                                             <p className="text-[#545756]">5 to 10</p>
@@ -285,6 +293,59 @@ const FreelancerDasboard  = () => {
                     </div>
                 </SheetContent>
             </Sheet>
+            
+            {/* Accept pay */}
+            <Dialog >
+                <DialogTrigger asChild>
+                    <div ref={acceptPayModal} className="hidden">Edit Profile</div>
+                </DialogTrigger>
+
+                <DialogContent className="sm:max-w-[425px] bg-white font-circular">
+                    <div className="flex flex-col items-center">
+                        <p className="text-[20px] font-poppins font-semibold text-[#18181B] mt-5">Receive Payment</p>
+                        <div className="max-w-80 flex justify-center">
+                            <span className="text-[#7E8082] font-normal font-circular text-sm text-center mt-5">You’re about to receive <span className="text-[#18181B] font-medium">50.5 ATOM</span> for Web Design. 
+                            Once confirmed, the payment will be sent to your wallet.</span>
+                        </div>
+
+                        <AcceptPayment className="scale-75"/>
+                        <span className="text-base text-[#7E8082]">Receiving <span className="text-lg text-black">50.5 ATOM</span></span>
+
+                        <div className="">
+                            <Button className="text-white w-full mt-6 px-28">Accept payment</Button>
+                        </div>
+                        <span className="text-[#7E8082] text-sm font-normal mt-4 mb-2">Need help? <span className="text-primary">Contact support.</span></span>
+                    </div>
+            
+                </DialogContent>
+            </Dialog>
+            
+            {/* Terminate contract */}
+            <Dialog >
+                <DialogTrigger asChild>
+                    <div ref={terminateModal} className="hidden">Edit Profile</div>
+                </DialogTrigger>
+
+                <DialogContent className="sm:max-w-[425px] bg-white">
+                    <div className="flex flex-col items-center">
+                        <p className="text-[20px] mb-4 font-poppins font-semibold text-[#18181B] mt-5"> Terminate Project</p>
+
+                        <TerminateContract className="scale-75"/>
+                        <span className="text-sm text-[#7E8082]">Freelancer</span>
+                        
+                        <div className=" flex justify-center">
+                            <span className="text-[#7E8082] font-normal font-circular text-sm text-center mt-5">Terminating this contract requires mutual agreement. Confirm to notify the client.</span>
+                        </div>
+                    </div>
+
+                    <div className="mb-3 flex space-x-3">
+                        <DialogClose className="w-full">
+                            <Button className="text-white w-full mt-6 border border-gray-300 bg-white text-primary hover:bg-white focus:bg-white">Cancel</Button>
+                        </DialogClose>
+                        <Button className="w-full mt-6 bg-[#FB822F] text-white hover:bg-[#FB822F] focus:bg-[#FB822F]">End Contract</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

@@ -2,10 +2,11 @@ import FreelancCalendar from "../icons/freelance/freelance-calendar"
 import { Button } from "../ui/button"
 
 type ActiveJobCardProps = {
-
+    acceptPayModal: React.MutableRefObject<HTMLDivElement>,
+    terminateContract: React.MutableRefObject<HTMLDivElement>
 }
 
-const ActiveJobCard = () => {
+const ActiveJobCard = ({acceptPayModal, terminateContract}: ActiveJobCardProps) => {
     return (
         <>
             <div className="">
@@ -36,8 +37,8 @@ const ActiveJobCard = () => {
                 </div>
 
                 <div className="flex items-center space-x-5 font-circular text-sm mt-4">
-                    <Button className="w-1/2 bg-white hover:bg-white rounded-full focus:bg-white border-[#FB822F] text-[#FB822F] border">Terminate</Button>
-                    <Button className="w-1/2 bg-[#F4F4F5] hover:bg-[#F4F4F5] rounded-full focus:bg-[#F4F4F5] text-[#7E8082] border-[#E4E4E7] border">Accept pay</Button>
+                    <Button onClick={() => {terminateContract.current.click()}} className="w-1/2 bg-white hover:bg-white rounded-full focus:bg-white border-[#FB822F] text-[#FB822F] border">Terminate</Button>
+                    <Button onClick={() => {acceptPayModal.current.click()}} className="w-1/2 bg-[#F4F4F5] hover:bg-[#F4F4F5] rounded-full focus:bg-[#F4F4F5] text-[#7E8082] border-[#E4E4E7] border">Accept pay</Button>
                 </div>
             </div>
         </>
