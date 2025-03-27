@@ -2,7 +2,8 @@ import { createContext, Dispatch, SetStateAction, useContext, useEffect, useStat
 import { ApplicationRoutes } from "../routes/routes-constant";
 
 type AuthContextProps = {
-    
+    isNewFreelanceUser: boolean,
+    setIsNewFreelanceUser: Dispatch<SetStateAction<boolean>>
 }
 
 type AuthProviderProps = {
@@ -12,10 +13,11 @@ type AuthProviderProps = {
 export const AuthContext = createContext<AuthContextProps | null>(null);
 
 const AuthProvider = ({children}: AuthProviderProps) => {
+    const [isNewFreelanceUser, setIsNewFreelanceUser] = useState(false)
 
     return (
         <AuthContext.Provider value={
-            {}}>
+            {isNewFreelanceUser, setIsNewFreelanceUser}}>
             {children}
         </AuthContext.Provider>
     )
@@ -27,7 +29,7 @@ export const useAuth = () => {
         throw new Error("useAuth must be used within an AuthProvider");
     }
 
-    const { } = context
+    const {isNewFreelanceUser, setIsNewFreelanceUser } = context
 
     const isLoggedIn = false
 
@@ -37,7 +39,9 @@ export const useAuth = () => {
 
     return {
        logout,
-       isLoggedIn
+       isLoggedIn,
+       isNewFreelanceUser,
+       setIsNewFreelanceUser
     }
 }
 

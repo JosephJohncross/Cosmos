@@ -7,6 +7,7 @@ import { cn } from "../../../lib/utils";
 import { Checkbox } from "../../ui/checkbox";
 import { LucideChevronLeft, LucideChevronRight, LucideX } from "lucide-react";
 import { Button } from "../../ui/button";
+import { useEffect } from "react";
 
 type WorkTypeDetailsProps = {
     handleNext: () => void,
@@ -77,6 +78,11 @@ const WorkTypeDetails = ({ handleNext, handleBack} : WorkTypeDetailsProps) => {
         setValue
 
     } = useFormContext<StepperFormValues>();
+
+     useEffect(() => {
+        window.scrollTo(0,0)
+    }, [])
+    
 
     return (
         <>

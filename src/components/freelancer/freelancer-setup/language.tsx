@@ -12,6 +12,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../
 import { useFormContext } from "react-hook-form";
 import { LucideChevronLeft, LucideChevronRight, LucidePlus } from "lucide-react";
 import { Button } from "../../ui/button";
+import { useEffect } from "react";
 
 type LanguageDetailsProps = {
     handleBack: () => void,
@@ -24,6 +25,11 @@ const LanguageDetails = ({handleBack, handleNext}: LanguageDetailsProps) => {
             formState: { errors },
             register,
     } = useFormContext<StepperFormValues>();
+
+     useEffect(() => {
+        window.scrollTo(0,0)
+    }, [])
+    
     
     return (
         <>

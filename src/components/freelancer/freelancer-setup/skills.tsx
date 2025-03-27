@@ -3,6 +3,7 @@ import { StepperFormValues } from "../../../hooks/hook-stepper"
 import { Input } from "../../ui/input"
 import { LucideChevronLeft, LucideChevronRight, LucidePlus, LucideSearch } from "lucide-react"
 import { Button } from "../../ui/button"
+import { useEffect } from "react"
 
 type SkillsDetailsProps = {
     handleBack: () => void,
@@ -61,6 +62,11 @@ const SkillsDetails = ({handleBack, handleNext}: SkillsDetailsProps) => {
         setValue
     
     } = useFormContext<StepperFormValues>();
+
+     useEffect(() => {
+        window.scrollTo(0,0)
+    }, [])
+    
     
     return (
         <>

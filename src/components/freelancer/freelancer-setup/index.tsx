@@ -17,6 +17,8 @@ import { Button } from "../../ui/button";
 import NewUsersStartPage from "./new-user-start-page";
 import SubmitDetails from "./submit";
 import { ApplicationRoutes } from "../../../routes/routes-constant";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/auth-context";
 
 const FreeLancerSetupSteps = () => {
     const [activeStep, setActiveStep] = useState(1);
@@ -24,6 +26,8 @@ const FreeLancerSetupSteps = () => {
     const methods = useForm<StepperFormValues>({
         mode: "onTouched",
     });
+    const navigate = useNavigate()
+    const {isNewFreelanceUser} = useAuth()
 
     const {toast} = useToast()
 
@@ -119,11 +123,15 @@ const FreeLancerSetupSteps = () => {
             case 7:
                 return <FinalDetails handleBack={handleBack} handleNext={handleNext}/>;
             case 8:
-                return <SubmitDetails/>
+                return <SubmitDetails setActiveStep={setActiveStep}/>
           default:
             return "Unknown step";
         }
     }
+
+    useEffect(() => {
+        !isNewFreelanceUser ? navigate(ApplicationRoutes.FREELANCER_DASHBOARD): ""
+    }, [])
 
     return (
         <>

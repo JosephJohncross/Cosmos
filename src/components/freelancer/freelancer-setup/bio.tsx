@@ -5,11 +5,15 @@ import { Input } from "../../ui/input";
 import { Textarea } from "../../ui/textarea";
 import { Button } from "../../ui/button";
 import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
+import { useEffect } from "react";
 
 type BioDetailsProps = {
     handleBack: () => void,
     handleNext: () => void
 }
+
+
+
 
 const BioDetails = ({handleBack, handleNext}: BioDetailsProps) => {
      const {
@@ -17,6 +21,10 @@ const BioDetails = ({handleBack, handleNext}: BioDetailsProps) => {
         formState: { errors },
         register,
     } = useFormContext<StepperFormValues>();
+
+    useEffect(() => {
+        window.scrollTo(0,0)
+    }, [])
     
     return (
         <>

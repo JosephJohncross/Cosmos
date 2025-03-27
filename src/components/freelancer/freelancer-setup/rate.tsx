@@ -4,6 +4,7 @@ import { FormControl, FormField, FormItem, FormMessage } from "../../ui/form";
 import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
 import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
+import { useEffect } from "react";
 
 
 type RateDetailsProps = {
@@ -17,6 +18,11 @@ const RateDetails = ({handleBack, handleNext}: RateDetailsProps) => {
         formState: { errors },
         register,
     } = useFormContext<StepperFormValues>();
+
+     useEffect(() => {
+        window.scrollTo(0,0)
+    }, [])
+    
 
     return (
         <>

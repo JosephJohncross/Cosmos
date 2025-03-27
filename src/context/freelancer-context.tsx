@@ -1,8 +1,7 @@
 import { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
 
 type FreelancerContextProps = {
-    isNewUser: boolean,
-    setIsNewUser: Dispatch<SetStateAction<boolean>>
+
 }
 
 type FreelancerProviderProps = {
@@ -12,10 +11,9 @@ type FreelancerProviderProps = {
 export const FreelancerContext = createContext<FreelancerContextProps | null>(null);
 
 const FreelancerProvider = ({children}: FreelancerProviderProps) => {
-    const [isNewUser, setIsNewUser] = useState(true)
 
     return (
-        <FreelancerContext.Provider value={{isNewUser, setIsNewUser}}>
+        <FreelancerContext.Provider value={{}}>
             {children}
         </FreelancerContext.Provider>
     )
@@ -27,11 +25,10 @@ export const useFreelancer = () => {
         throw new Error("useFreelancer must be used within an FreelancerProvider");
     }
 
-    const {isNewUser, setIsNewUser } = context
+    const {} = context
 
     return {
-        isNewUser,
-        setIsNewUser
+    
     }
 }
 
