@@ -1295,6 +1295,14 @@ html {
   margin-top: auto;
 }
 
+.mr-6 {
+  margin-right: 1.5rem;
+}
+
+.mr-24 {
+  margin-right: 6rem;
+}
+
 .block {
   display: block;
 }
@@ -2192,6 +2200,11 @@ html {
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
+.border-black {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity));
+}
+
 .border-l-transparent {
   border-left-color: transparent;
 }
@@ -2572,6 +2585,14 @@ html {
 
 .pt-8 {
   padding-top: 2rem;
+}
+
+.pt-2 {
+  padding-top: 0.5rem;
+}
+
+.pr-20 {
+  padding-right: 5rem;
 }
 
 .text-left {
