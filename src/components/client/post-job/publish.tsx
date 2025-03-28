@@ -12,6 +12,7 @@ import { useRef } from "react";
 import WalletSign from "../../icons/client/wallet-verify";
 import ApplySuceess from "../../icons/freelance/apply-success";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { useAuth } from "../../../context/auth-context";
 
 type PublishSectionProps = {
     setActiveStep: React.Dispatch<React.SetStateAction<number>>
@@ -19,11 +20,13 @@ type PublishSectionProps = {
 
 const PublishSection = ({setActiveStep} : PublishSectionProps) => {
     const navigate = useNavigate()
+    const {setHasJob} = useAuth()
     const successModal = useRef<HTMLDivElement>(null)
     const walletSignModal = useRef<HTMLDivElement>(null)
     const walletSignModalClose = useRef<HTMLDivElement>(null)
 
     const handleSuccess = () => {
+        setHasJob(true)
         walletSignModalClose.current.click()
         successModal.current.click()
 

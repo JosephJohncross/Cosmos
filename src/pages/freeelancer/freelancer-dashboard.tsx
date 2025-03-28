@@ -93,6 +93,7 @@ const FreelancerDasboard  = () => {
     const terminateModal = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
+        console.log(isNewFreelanceUser)
         isNewFreelanceUser ? navigate(ApplicationRoutes.FREELANCER_SETUP) : ""
     }, [])
 

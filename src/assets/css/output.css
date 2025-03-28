@@ -1291,6 +1291,10 @@ html {
   margin-top: auto;
 }
 
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
+
 .block {
   display: block;
 }
@@ -1438,6 +1442,14 @@ html {
 
 .h-px {
   height: 1px;
+}
+
+.h-\[80vh\] {
+  height: 80vh;
+}
+
+.h-\[60vh\] {
+  height: 60vh;
 }
 
 .max-h-96 {
@@ -1589,8 +1601,12 @@ html {
   min-width: var(--radix-select-trigger-width);
 }
 
-.min-w-3 {
-  min-width: 0.75rem;
+.min-w-20 {
+  min-width: 5rem;
+}
+
+.min-w-16 {
+  min-width: 4rem;
 }
 
 .max-w-16 {
@@ -1973,12 +1989,6 @@ html {
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 
-.space-y-3 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
-}
-
 .divide-x > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-x-reverse: 0;
   border-right-width: calc(1px * var(--tw-divide-x-reverse));
@@ -2189,6 +2199,16 @@ html {
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
+.border-\[\#8EFFBE\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(142 255 190 / var(--tw-border-opacity));
+}
+
+.border-black {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity));
+}
+
 .border-l-transparent {
   border-left-color: transparent;
 }
@@ -2210,6 +2230,11 @@ html {
 .bg-\[\#545756\] {
   --tw-bg-opacity: 1;
   background-color: rgb(84 87 86 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#7E8082\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(126 128 130 / var(--tw-bg-opacity));
 }
 
 .bg-\[\#DFFFED\] {
@@ -2303,9 +2328,9 @@ html {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
-.bg-\[\#7E8082\] {
+.bg-\[\#D4FFE7\] {
   --tw-bg-opacity: 1;
-  background-color: rgb(126 128 130 / var(--tw-bg-opacity));
+  background-color: rgb(212 255 231 / var(--tw-bg-opacity));
 }
 
 .bg-none {
@@ -2362,6 +2387,11 @@ html {
   padding-right: 0.25rem;
 }
 
+.px-10 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -2395,6 +2425,11 @@ html {
 .px-6 {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+}
+
+.px-7 {
+  padding-left: 1.75rem;
+  padding-right: 1.75rem;
 }
 
 .px-8 {
@@ -2447,19 +2482,9 @@ html {
   padding-bottom: 2rem;
 }
 
-.px-7 {
-  padding-left: 1.75rem;
-  padding-right: 1.75rem;
-}
-
 .px-9 {
   padding-left: 2.25rem;
   padding-right: 2.25rem;
-}
-
-.px-10 {
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
 }
 
 .pb-10 {
@@ -2564,6 +2589,10 @@ html {
 
 .pt-8 {
   padding-top: 2rem;
+}
+
+.pb-40 {
+  padding-bottom: 10rem;
 }
 
 .text-left {
@@ -3426,6 +3455,11 @@ html {
 
 .hover\:bg-white\/80:hover {
   background-color: rgb(255 255 255 / 0.8);
+}
+
+.hover\:bg-\[\#D4FFE7\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(212 255 231 / var(--tw-bg-opacity));
 }
 
 .hover\:text-\[\#7E8082\]:hover {

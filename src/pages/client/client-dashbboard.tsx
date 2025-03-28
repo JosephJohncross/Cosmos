@@ -1,10 +1,21 @@
-import { ReactNode } from "react"
-import { Button } from "../../components/ui/button"
-import NotificationCard from "../../components/freelancer/notification-card"
-import NoPostIcon from "../../components/icons/client/no-post-icon"
 import { LucidePlus } from "lucide-react"
-import ExpertCard, { ExpertCardType } from "../../components/client/expert-card"
+import { useRef } from "react"
 import { Link } from "react-router-dom"
+import ActiveHireJob from "../../components/client/active-project-card"
+import ExpertCard, { ExpertCardType } from "../../components/client/expert-card"
+import PostJobCard from "../../components/client/job-card"
+import NotificationCard from "../../components/freelancer/notification-card"
+import { ProjectListingComponentType } from "../../components/freelancer/project-listing-component"
+import NoPostIcon from "../../components/icons/client/no-post-icon"
+import ApplySuceess from "../../components/icons/freelance/apply-success"
+import { Button } from "../../components/ui/button"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogTrigger
+} from "../../components/ui/dialog"
+import { useAuth } from "../../context/auth-context"
 import { ApplicationRoutes } from "../../routes/routes-constant"
 
 const dummyClient: ExpertCardType[] = [
@@ -46,27 +57,86 @@ const dummyClient: ExpertCardType[] = [
     },
 ]
 
+const dummyPostings: ProjectListingComponentType[] = [
+    {
+        applicants: "5 to 10",
+        detail: "Our web designer is responsible for creating the visual layout and aesthetic of a website, including its overall design, user interface (UI), and user experience (UX), by utilizing graphic design principles in Figma, Illustrator and Photoshop and coding languages like HTML....",
+        duration: "1 10 3 weeks",
+        funding: "50.5 ATOM",
+        hourlyPay: "2.5 ATOM",
+        location: "Canada",
+        role: "Web Designer - UIUX",
+        skills: ["Web Design", "UIUX Design", "Prototyping"],
+        timePosted: "3 hours",
+        verified: true
+    },
+
+    {
+        applicants: "5 to 10",
+        detail: "Our web designer is responsible for creating the visual layout and aesthetic of a website, including its overall design, user interface (UI), and user experience (UX), by utilizing graphic design principles in Figma, Illustrator and Photoshop and coding languages like HTML....",
+        duration: "1 10 3 weeks",
+        funding: "50.5 ATOM",
+        hourlyPay: "2.5 ATOM",
+        location: "Canada",
+        role: "Brand Ambassador",
+        skills: ["Web Design", "UIUX Design", "Prototyping"],
+        timePosted: "3 hours",
+        verified: false
+    },
+]
+
 const ClientDashboard  = () => {
+    const editJob = useRef<HTMLDivElement>(null)
+    const {hasJob} = useAuth()
+    const confirmPayment = useRef<HTMLDivElement>(null)
+    const closeConfirmPayment = useRef<HTMLDivElement>(null)
+    const terminateContractModal = useRef<HTMLDivElement>(null)
+    const paymentSuccessModal = useRef<HTMLDivElement>(null)
+    
     return (
         <>
             <main className="mt-32 mb-20">
                 <div className="app-container">
+                    { hasJob &&
+                        <div className="flex justify-end mb-5">
+                            <Link to={ApplicationRoutes.POST_A_JOB}>
+                                <Button className="flex items-center text-white space-x-2">
+                                    <LucidePlus size={20}/>
+                                    <p className="font-circular font-medium text-sm">Post a project</p>
+                                </Button>
+                            </Link>
+                        </div>
+                    }
+
                     <div className=" grid grid-cols-12 gap-x-3">
                         <div className="bg-white shadow-md h-[90vh] overflow-hidden rounded-lg col-span-8 p-6 px-8">
                             <div className="border-b border-gray-200 p-4 text-[#7E8082] font-medium text-lg">Project Overview</div>
 
-                            <div className="pt-20 flex flex-col items-center font-circular">
-                                <NoPostIcon className="scale-90"/>
+                            { !hasJob ?
+                                <div className="pt-20 flex flex-col items-center font-circular">
+                                    <NoPostIcon className="scale-90"/>
 
-                                <p className="text-[#545756] my-9">No active job posts or contracts at the moment.</p>
+                                    <p className="text-[#545756] my-9">No active job posts or contracts at the moment.</p>
 
-                                <Link to={ApplicationRoutes.POST_A_JOB} className="">
-                                    <Button className="flex items-center text-primary bg-white space-x-3 border border-primary rounded-md hover:bg-white focus:bg-white">
-                                        <LucidePlus size={19}/>
-                                        <p className="font-medium text-base">Post a project</p>
-                                    </Button>
-                                </Link>
-                            </div>
+                                    <Link to={ApplicationRoutes.POST_A_JOB} className="">
+                                        <Button className="flex items-center text-primary bg-white space-x-3 border border-primary rounded-md hover:bg-white focus:bg-white">
+                                            <LucidePlus size={19}/>
+                                            <p className="font-medium text-base">Post a project</p>
+                                        </Button>
+                                    </Link>
+                                </div> :
+
+                                <div className="divide-y divide-gray-300 flex flex-col gap-y-10 pt-8 h-[70vh] overflow-y-auto custom-scrollbar pb-20">
+                                    {dummyPostings.map((post, index) => {
+                                        return (
+                                            <PostJobCard
+                                                data={post}
+                                                editJob={editJob}
+                                            />
+                                        )
+                                    })}
+                                </div>
+                            }
                         </div>
 
                         <div className="col-span-4  pb-10 overflow-y-auto custom-scrollbar flex flex-col gap-y-6 font-circular">
@@ -76,7 +146,22 @@ const ClientDashboard  = () => {
                                 <div className="p-4">
                                     <NotificationCard/>
                                 </div>
-                            </div>
+                            </div>  
+                            
+                            { hasJob &&
+                                <div className="bg-white rounded-lg font-circular shadow-md min-h-52">
+                                    <div className="border-b border-gray-200 p-4 text-[#7E8082] font-medium text-lg">Active Projects</div>
+
+                                    <div className="p-4">
+                                        <div className="">
+                                            <ActiveHireJob
+                                                acceptPayModal={confirmPayment}
+                                                terminateContract={terminateContractModal}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
 
                             <div className="bg-[#18181B] rounded-lg font-circular shadow-md min-h-52 mb-20 p-8 relative">
                                 <p className="font-poppins text-white font-bold text-sm">Get started</p>
@@ -138,6 +223,93 @@ const ClientDashboard  = () => {
 
                 </div>
             </main>
+
+             {/* Accept pay */}
+             <Dialog >
+                <DialogTrigger asChild>
+                    <div ref={confirmPayment} className="hidden">Edit Profile</div>
+                </DialogTrigger>
+
+                <DialogContent className="sm:max-w-[425px] bg-white font-circular">
+                    <div className="flex flex-col items-center">
+                        <p className="text-[20px] font-poppins font-semibold text-[#18181B] mt-5">Receive Payment</p>
+                        <div className="max-w-80 flex justify-center mb-5">
+                            <span className="text-[#7E8082] font-normal font-circular text-sm text-center mt-5">You’re about to pay Onest Man <span className="text-[#18181B] font-medium">50.5 ATOM</span> for Web Design. Once confirmed, the payment will be sent.</span>
+                        </div>
+
+                        <img
+                            src="/images/client/client.png"
+                            alt="client"
+                        />
+                        <span className="text-base text-[#7E8082]">Sending <span className="text-lg text-black">50.5 ATOM</span></span>
+
+                        <div className="">
+                            <Button onClick={()=> {closeConfirmPayment.current.click(); paymentSuccessModal.current.click()}} className="text-white w-full mt-6 px-28">Confirm payment</Button>
+                        </div>
+                        <span className="text-[#7E8082] text-sm font-normal mt-4 mb-2">Need help? <span className="text-primary">Contact support.</span></span>
+                    </div>
+            
+                </DialogContent>
+
+                <DialogClose className="hidden">
+                    <div ref={closeConfirmPayment} className="w-full text-white px-9 mt-6 py-5 pb-6">Okay</div>
+                </DialogClose>
+            </Dialog>
+            
+            {/* Terminate contract */}
+            <Dialog >
+                <DialogTrigger asChild>
+                    <div ref={terminateContractModal} className="hidden">Edit Profile</div>
+                </DialogTrigger>
+
+                <DialogContent className="sm:max-w-[425px] bg-white">
+                    <div className="flex flex-col items-center">
+                        <p className="text-[20px] mb-6 font-poppins font-semibold text-[#18181B] mt-5">  Terminate Freelancer</p>
+
+                        <img
+                            src="/images/client/client.png"
+                            alt="client"
+                        />
+                        <span className="text-sm text-[#7E8082]">Freelancer</span>
+                        
+                        <div className=" flex justify-center">
+                            <span className="text-[#7E8082] font-normal font-circular text-sm text-center mt-5">Terminating this contract requires mutual agreement. Confirm to notify Onest Man.</span>
+                        </div>
+                    </div>
+
+                    <div className="mb-3 flex space-x-3">
+                        <DialogClose className="w-full">
+                            <Button className="text-white w-full mt-6 border border-gray-300 bg-white text-primary hover:bg-white focus:bg-white">Cancel</Button>
+                        </DialogClose>
+                        <Button className="w-full mt-6 bg-[#FB822F] text-white hover:bg-[#FB822F] focus:bg-[#FB822F]">End Contract</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* success modal */}
+            <Dialog>
+                <DialogTrigger asChild>
+                    <div ref={paymentSuccessModal} className="hidden">Edit Profile</div>
+                </DialogTrigger>
+
+                <DialogContent className="sm:max-w-[425px] bg-white">
+                    <div className="flex flex-col items-center">
+                        <ApplySuceess className="scale-75"/>
+
+                        <p className="text-[20px] font-poppins font-semibold text-[#18181B] mt-5">Payment Successful</p>
+                        
+                        <div className="max-w-80">
+                            <p className="font-circular text-[#545756] text-base text-center mt-5">Your payment of 50.5 ATOM has been successfully 
+                            sent to Onest Man. Thank you for completing the transaction!</p>
+                        </div>
+
+                        <DialogClose className="">
+                            <Button className="w-full text-white px-9 mt-6 py-5 pb-6">Okay</Button>
+                        </DialogClose>
+                    </div>
+            
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

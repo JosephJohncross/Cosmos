@@ -123,10 +123,6 @@ const PostAJobSteps = () => {
         }
     }
 
-    useEffect(() => {
-        !isNewFreelanceUser ? navigate(ApplicationRoutes.FREELANCER_DASHBOARD): ""
-    }, [])
-
     return (
         <>
             {/* Stepper indicator */}

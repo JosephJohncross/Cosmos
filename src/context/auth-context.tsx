@@ -3,7 +3,9 @@ import { ApplicationRoutes } from "../routes/routes-constant";
 
 type AuthContextProps = {
     isNewFreelanceUser: boolean,
-    setIsNewFreelanceUser: Dispatch<SetStateAction<boolean>>
+    setIsNewFreelanceUser: Dispatch<SetStateAction<boolean>>,
+    hasJob: boolean,
+    setHasJob: Dispatch<SetStateAction<boolean>>
 }
 
 type AuthProviderProps = {
@@ -14,10 +16,11 @@ export const AuthContext = createContext<AuthContextProps | null>(null);
 
 const AuthProvider = ({children}: AuthProviderProps) => {
     const [isNewFreelanceUser, setIsNewFreelanceUser] = useState(true)
+    const [hasJob, setHasJob] = useState(false)
 
     return (
         <AuthContext.Provider value={
-            {isNewFreelanceUser, setIsNewFreelanceUser}}>
+            {isNewFreelanceUser, setIsNewFreelanceUser, hasJob, setHasJob}}>
             {children}
         </AuthContext.Provider>
     )
@@ -29,7 +32,7 @@ export const useAuth = () => {
         throw new Error("useAuth must be used within an AuthProvider");
     }
 
-    const {isNewFreelanceUser, setIsNewFreelanceUser } = context
+    const {isNewFreelanceUser, setIsNewFreelanceUser, hasJob, setHasJob } = context
 
     const isLoggedIn = false
 
@@ -41,7 +44,9 @@ export const useAuth = () => {
        logout,
        isLoggedIn,
        isNewFreelanceUser,
-       setIsNewFreelanceUser
+       setIsNewFreelanceUser,
+       hasJob,
+       setHasJob
     }
 }
 
