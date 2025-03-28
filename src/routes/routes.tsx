@@ -9,6 +9,7 @@ import ClientDashboard from "../pages/client/client-dashbboard";
 import FreeLancerProviderWrapper from "../pages/freeelancer/freelancer-provider";
 import ApplyForJobPage from "../pages/freeelancer/apply-job";
 import PostAJobSteps from "../components/client/post-job";
+import ProposalPage from "../pages/client/proposal";
 
 
 export const CustomRoutes = () => {
@@ -21,6 +22,7 @@ export const CustomRoutes = () => {
       <Route element={<ClientDashboard/>} path={ApplicationRoutes.CLIENT_DASHBOARD}></Route>
       <Route element={<ApplyForJobPage/>} path={ApplicationRoutes.JOB_APPLY}></Route>
       <Route element={<PostAJobSteps/>} path={ApplicationRoutes.POST_A_JOB}></Route>
+      <Route element={<ProposalPage/>} path={ApplicationRoutes.PROPOSAL}></Route>
     </Route>,
   ];
 };

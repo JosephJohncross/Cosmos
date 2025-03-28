@@ -34,6 +34,7 @@ const PublishSection = ({setActiveStep} : PublishSectionProps) => {
             navigate(ApplicationRoutes.CLIENT_DASHBOARD)
         }, 3000)
     }
+    
     return(
         <>
             <main className="mt-32 px-5 mb-36">

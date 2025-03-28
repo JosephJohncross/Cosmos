@@ -284,7 +284,7 @@ const FreelancerDasboard  = () => {
                                     <div className="">
                                         <p className="text-[#545756]">Job link</p>
 
-                                        <div className="rounded-md mt-2 w-max p-3 font-circular text-sm text-[#BEBEBE] bg-[#F4F4F5] border border-[#E4E4E7]">https://www.ATwork.com/jobs/</div>
+                                        <div className="rounded-md mt-2 w-max p-3 font-circular text-sm text-[#BEBEBE] bg-[#F4F4F5] border border-[#E4E4E7]">https://www.Work.com/jobs/</div>
                                     
                                         <p className="cursor-pointer underline text-primary mt-5 text-base">Copy link</p>
                                     </div>

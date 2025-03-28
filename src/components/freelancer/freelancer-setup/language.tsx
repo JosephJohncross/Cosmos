@@ -39,7 +39,7 @@ const LanguageDetails = ({handleBack, handleNext}: LanguageDetailsProps) => {
 
                     <h1 className="font-poppins font-semibold text-[32px] mt-1"><span className="text-[#7E8082]">Looking good! </span> Now, tell us which languages you speak.</h1>
 
-                    <p className="text-[#7E8082] font-circular text-base mt-2 max-w-screen-md">Clients on ATwork often look for multilingual talent. English is a must, do you know any others?</p>
+                    <p className="text-[#7E8082] font-circular text-base mt-2 max-w-screen-md">Clients on Work often look for multilingual talent. English is a must, do you know any others?</p>
                 
                     <div className="bg-white relative rounded-xl p-10 mt-9 ">
                         <div className="w-3/4 flex justify-between items-baseline">

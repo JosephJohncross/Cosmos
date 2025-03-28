@@ -6,5 +6,6 @@ export const ApplicationRoutes = {
     FREELANCER_DASHBOARD: "/freelancer/dashboard",
     CLIENT_DASHBOARD: "/client/dashboard",
     JOB_APPLY: "/apply",
-    POST_A_JOB: "/post"
+    POST_A_JOB: "/post",
+    PROPOSAL: "/proposal"
 };

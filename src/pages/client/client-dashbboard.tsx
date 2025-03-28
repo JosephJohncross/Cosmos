@@ -1,5 +1,5 @@
 import { LucidePlus } from "lucide-react"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 import ActiveHireJob from "../../components/client/active-project-card"
 import ExpertCard, { ExpertCardType } from "../../components/client/expert-card"
@@ -92,6 +92,10 @@ const ClientDashboard  = () => {
     const closeConfirmPayment = useRef<HTMLDivElement>(null)
     const terminateContractModal = useRef<HTMLDivElement>(null)
     const paymentSuccessModal = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        window.scrollTo(0,0)
+    }, [])
     
     return (
         <>

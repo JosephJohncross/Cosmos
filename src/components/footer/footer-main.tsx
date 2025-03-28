@@ -16,7 +16,7 @@ const FooterMain = () => {
                 </div>
 
                 <div className="py-4 flex justify-center">
-                    <p className="text-[#545756] font-circular font-medium text-[14px]">© 2025 ATwork. All rights reserved</p>
+                    <p className="text-[#545756] font-circular font-medium text-[14px]">© 2025 Work. All rights reserved</p>
                 </div>
 
             </div>

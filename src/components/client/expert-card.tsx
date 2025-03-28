@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom"
 import LocationIcon from "../icons/freelance/location-icon"
 import { Button } from "../ui/button"
+import { ApplicationRoutes } from "../../routes/routes-constant"
 
 type ExpertCardProps = {
     name: string,
@@ -72,9 +74,9 @@ const ExpertCard = ({
                     <p className="text-[#7E8082] text-sm mt-2">I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...</p>
                 </div>
 
-                <div className="">
+                <Link to={ApplicationRoutes.PROPOSAL} className="">
                     <Button className="w-full bg-white hover:bg-white focus:bg-white border border-primary rounded-md text-primary">Book a consultation</Button>
-                </div>
+                </Link>
             </div>
         </>
     )

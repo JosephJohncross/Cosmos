@@ -41,9 +41,9 @@ const Home = () => {
                     <div className="mt-44">
                         <div className="bg-white flex rounded-2xl inset-1 border border-[#E4E4E7] p-8">
                             <div className="w-1/2 font-circular max-w-xl text-[18px] font-normal">
-                                <h1 className="text-[#7E8082] font-poppins font-semibold text-[32px] mt-2">About <span className="text-[#18181B]">ATwork</span></h1>
+                                <h1 className="text-[#7E8082] font-poppins font-semibold text-[32px] mt-2">About <span className="text-[#18181B]">Work</span></h1>
 
-                                <p className="text-[#545756] my-5">ATwork streamlines the freelance hiring process, providing businesses with instant access to a network of skilled professionals. Our platform enables seamless collaborations, efficient project management, and exceptional results</p>
+                                <p className="text-[#545756] my-5">Work streamlines the freelance hiring process, providing businesses with instant access to a network of skilled professionals. Our platform enables seamless collaborations, efficient project management, and exceptional results</p>
 
                                 <span className="text-[#545756]"><span className="text-[#18181B]">Our Mission</span> is to empower businesses to achieve their goals by providing a seamless and efficient platform for connecting with top freelance talent.</span>
                                 <div className="mt-1"/>

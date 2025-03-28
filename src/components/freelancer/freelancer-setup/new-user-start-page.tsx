@@ -9,7 +9,7 @@ const NewUsersStartPage = ({handleNext}: { handleNext: () => void}) => {
                     <h1 className="font-poppins font-semibold text-[32px] text-center">Hi Onesty</h1>
 
                     <div className="font-circular text-[#7E8082] flex flex-col items-center mt-2">
-                        <span className="">Welcome to <span className="text-[#545756]">ATwork,</span></span>
+                        <span className="">Welcome to <span className="text-[#545756]">Work,</span></span>
                         <p className="">Let’s setup your account for you.</p>
                     </div>
 
