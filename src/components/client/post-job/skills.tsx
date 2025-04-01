@@ -1,9 +1,10 @@
 import { LucideChevronLeft, LucideChevronRight, LucidePlus, LucideSearch } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { PostJobStepperFormValues } from "../../../hooks/post-job-stepper"
 import { Button } from "../../ui/button"
 import { Input } from "../../ui/input"
+import { MultiSelector } from "../../ui/multi-select"
 
 type SkillSectionProps = {
     handleBack: () => void,
@@ -11,48 +12,19 @@ type SkillSectionProps = {
 }
 
 const dummySkills = [
-    {
-        name: "Branding",
-        value: "branding"
-    },
-    {
-        name: "Product Design",
-        value: "product"
-    },
-    {
-        name: "Branding",
-        value: "branding"
-    },
-    {
-        name: "Web Developer",
-        value: "web"
-    },
-    {
-        name: "Business Presentation",
-        value: "bus"
-    },
-    {
-        name: "Blockchain Analyst",
-        value: "blockchain"
-    },
-    {
-        name: "Electrical Engineer",
-        value: "electrical"
-    },
-    {
-        name: "Animation",
-        value: "anime"
-    },
-    {
-        name: "Software Developer",
-        value: "software"
-    },
-    {
-        name: "Marketing",
-        value: "market"
-    },
-]
+    "Branding",
+    "Product Design",
+    "Web Developer",
+    "Business Presentation",
+    "Blockchain Analyst",
+    "Electrical Engineer",
+    "Animation",
+    "Software Developer",
+    "Marketing"
+  ];
+  
 const SkillSection = ({handleBack, handleNext}: SkillSectionProps) => {
+    const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
     const {
         control,
@@ -65,6 +37,23 @@ const SkillSection = ({handleBack, handleNext}: SkillSectionProps) => {
      useEffect(() => {
         window.scrollTo(0,0)
     }, [])
+
+    useEffect(() => {
+        // Update form value when selectedSkills changes
+        setValue("skills", selectedSkills);
+      }, [selectedSkills, setValue]);
+    
+      const handleAddSkill = (skill: string) => {
+        if (selectedSkills.length >= 5) return;
+        if (!selectedSkills.includes(skill)) {
+          setSelectedSkills([...selectedSkills, skill]);
+        }
+      };
+    
+      const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        handleNext(); // Or whatever you want to do on form submission
+      };
     
     
     return (
@@ -77,33 +66,41 @@ const SkillSection = ({handleBack, handleNext}: SkillSectionProps) => {
 
                     <p className="text-[#7E8082] font-circular text-base mt-2">The skills you select will help freelancers determine if they are well-equipped for this role.</p>
 
+                        
+                <form onSubmit={handleFormSubmit}>
                     <div className="bg-white relative rounded-xl p-10 mt-9 pb-20">
                         <div className="w-3/4 relative">
-                            <LucideSearch className="absolute text-[#545756] top-1/2 -translate-y-1/2 left-6" size={20}/>
-                            <Input
-                                placeholder="Search skills here"
-                                onChange={(event) =>
-                                    setValue("skills", [...getValues("skills"), event.target.value])
-                                }
-                                className="w-full py-6 placeholder:text-[#BEBEBE] font-circular pl-14 bg-transparent border border-gray-300"
+                             <MultiSelector
+                                selected={selectedSkills}
+                                onChange={setSelectedSkills}
+                                maxSelections={5}
                             />
-                            <p className="absolute right-0 -bottom-8 font-circular text-sm text-[#7E8082]">Max 5 skills</p>
+                            <div className="flex justify-end">
+                                <p className="font-circular text-sm text-[#7E8082] mt-2">Max 5 skills</p>
+        
+                            </div>
                         </div>
                         
                         <div className="mt-20">
                             <p className="text-base font-circular text-[#545756]">Suggested skills</p>
 
                             <div className="flex flex-wrap w-3/4 mt-6 gap-3">
-                                { dummySkills.map(skill => {
-                                    return (
-                                        <div key={skill.value} className="rounded-full flex items-center space-x-2 cursor-pointer hover:text-primary transition-colors font-circular text-base text-[#545756] border border-gray-200 py-2 px-4">
-                                            <LucidePlus size={20}/>
-                                            <p className="">{skill.name}</p>
-                                        </div>
-                                    )
-                                })
-
-                                }
+                                {dummySkills.map((skill) => (
+                                                    <button
+                                                        key={skill}
+                                                        type="button"
+                                                        onClick={() => handleAddSkill(skill)}
+                                                        disabled={selectedSkills.length >= 5}
+                                                        className={`rounded-full flex items-center space-x-2 cursor-pointer transition-colors font-circular text-base ${
+                                                        selectedSkills.includes(skill)
+                                                            ? "bg-primary text-white"
+                                                            : "text-[#545756] hover:text-primary border border-gray-200"
+                                                        } py-2 px-4`}
+                                                    >
+                                                        {!selectedSkills.includes(skill) && <LucidePlus size={20} />}
+                                                        <p>{skill}</p>
+                                                    </button>
+                                                    ))}
                             </div>
                         </div>
 
@@ -119,6 +116,7 @@ const SkillSection = ({handleBack, handleNext}: SkillSectionProps) => {
                             </Button>
                         </div>
                     </div>
+                </form>
                 </div>
             </main>
         </>

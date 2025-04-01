@@ -24,7 +24,7 @@ const HeaderEnd = () => {
             </div> */}
     {/*             <WalletConnection /> */}
                 <Link to={ApplicationRoutes.JOIN}>
-                    <Button className="bg-primary rounded-md py-4 px-6 font-circular text-white font-medium">Connect Wallet</Button>
+                    <Button className="bg-primary rounded-md py-4 px-6 font-circular text-white font-medium">Join</Button>
                 </Link>
         </div>
         </>
