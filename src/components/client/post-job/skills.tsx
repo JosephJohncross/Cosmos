@@ -69,12 +69,12 @@ const SkillSection = ({handleBack, handleNext}: SkillSectionProps) => {
                         
                 <form onSubmit={handleFormSubmit}>
                     <div className="bg-white relative rounded-xl p-10 mt-9 pb-20">
-                        <div className="w-3/4 relative">
-                             <MultiSelector
-                                selected={selectedSkills}
-                                onChange={setSelectedSkills}
-                                maxSelections={5}
-                            />
+                            <div className="w-3/4 relative">
+                                <MultiSelector
+                                    selected={selectedSkills}
+                                    onChange={setSelectedSkills}
+                                    maxSelections={5}
+                                />
                             <div className="flex justify-end">
                                 <p className="font-circular text-sm text-[#7E8082] mt-2">Max 5 skills</p>
         

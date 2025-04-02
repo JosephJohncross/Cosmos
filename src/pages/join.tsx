@@ -62,8 +62,9 @@ const JoinPage = () => {
         },
     })
 
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
+    const handleJoin = () => {
         userType == 'client' ? navigate(ApplicationRoutes.CLIENT_DASHBOARD) : navigate(ApplicationRoutes.FREELANCER_DASHBOARD)
+        setIsOpen(false)
     }
 
     useEffect(() => {
@@ -146,14 +147,14 @@ const JoinPage = () => {
                             </RadioGroup>
 
                             <div className="">
-                                <Button onClick={()=> {setIsOpen(false)}} className="bg-primary text-white w-full mt-6 py-6">Join as a {userType === "freelancer" ? "Freelancer" : "Client"}</Button>
+                                <Button onClick={()=> {handleJoin()}} className="bg-primary text-white w-full mt-6 py-6">Join as a {userType === "freelancer" ? "Freelancer" : "Client"}</Button>
                             </div>
                         </div>
                 
                     </DialogContent>
                 </Dialog>
 
-                <div className="content-container">
+                {/* <div className="content-container">
                     <div className="flex flex-col items-center">
                         <h1 className="font-poppins font-semibold text-[32px] text-black">Setup {userType === "freelancer" ? "Freelancer" : "Client"} account</h1>
                         <div className="w-full justify-center flex ">
@@ -255,7 +256,7 @@ const JoinPage = () => {
                             </Form>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </main>
         </>
     )
