@@ -1,12 +1,12 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ApplicationRoutes } from './routes-constant';
-import ApplyForJobPage from '../pages/freeelancer/apply-job';
+import ApplyForJobPage from '../pages/freelancer/apply-job';
 import ClientDashboard from '../pages/client/client-dashbboard';
 import FreelancerDashboard from '../pages/freeelancer/freelancer-dashboard';
 
-const AppRouter = () => {
+const AppRoutes = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route
           path={ApplicationRoutes.CLIENT_DASHBOARD}
@@ -17,12 +17,12 @@ const AppRouter = () => {
           element={<FreelancerDashboard />}
         />
         <Route
-          path={ApplicationRoutes.JOB_APPLY_WITH_ID}
+          path={ApplicationRoutes.JOB_APPLY} // Use the constant from routes-constant.ts
           element={<ApplyForJobPage />}
         />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 };
 
-export default AppRouter;
+export default AppRoutes;

@@ -80,6 +80,29 @@ export const useJobContract = () => {
 
           console.log('Fetching jobs from contract:', jobContractAddress);
 
+          // Try the GetJobs query first (if it exists)
+          try {
+            const result = await queryContract(jobContractAddress, {
+              GetJobs: {},
+            });
+
+            if (result && Array.isArray(result.jobs)) {
+              console.log('Found jobs using GetJobs query:', result.jobs);
+              setJobs(
+                result.jobs.map((job: any, index: number) => ({
+                  ...job,
+                  id: job.id || index.toString(),
+                }))
+              );
+              hasInitiallyFetched.current = true;
+              return;
+            }
+          } catch (e) {
+            console.log(
+              'GetJobs query not supported, falling back to individual queries'
+            );
+          }
+
           // Since there's no GetAllJobs query, we'll fetch individual jobs by ID
           const fetchedJobs: Job[] = [];
 

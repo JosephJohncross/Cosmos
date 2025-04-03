@@ -33,6 +33,7 @@ const ProjectListingComponent = ({
     skills,
     timePosted,
     verified,
+    id,
   },
   jobDetailsModal,
   onViewDetails,
@@ -40,6 +41,8 @@ const ProjectListingComponent = ({
   const { isConnected } = useXionWallet();
 
   const handleClick = () => {
+    console.log('Job clicked:', { id, role });
+
     if (onViewDetails) {
       onViewDetails();
     } else {
