@@ -13,6 +13,8 @@ import ActiveJobCard from '../../components/freelancer/active-job-card';
 import { useXionWallet } from '../../context/xion-context';
 import { useJobContract } from '../../hooks/useJobContract';
 import ConnectionPrompt from '../../components/xion/ConnectionPrompt';
+import XionBalance from '../../components/xion/XionBalance';
+import XionWalletConnect from '../../components/xion/XionWalletConnect';
 import {
   Sheet,
   SheetTrigger,
@@ -32,6 +34,7 @@ import {
 } from '../../components/ui/dialog';
 import TerminateContract from '../../components/icons/freelance/terminate-contract';
 import AcceptPayment from '../../components/icons/freelance/accept-payment';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 
 const FreelancerDasboard = () => {
   const { isNewFreelanceUser } = useAuth();
@@ -39,10 +42,24 @@ const FreelancerDasboard = () => {
   const jobDetailsBtn = useRef<HTMLDivElement>(null);
   const acceptPayModal = useRef<HTMLDivElement>(null);
   const terminateModal = useRef<HTMLDivElement>(null);
-  const { isConnected } = useXionWallet();
+  const { isConnected, address, connect, disconnect } = useXionWallet();
 
   const { jobs, isLoading, error, refetch } = useJobContract();
   const [searchTerm, setSearchTerm] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+
+  useEffect(() => {
+    console.log(
+      'Freelancer dashboard - Xion wallet status:',
+      isConnected ? 'Connected' : 'Disconnected'
+    );
+    console.log('Freelancer dashboard - Wallet address:', address);
+
+    if (isConnected) {
+      setAuthError(null);
+    }
+  }, [isConnected, address]);
 
   useEffect(() => {
     console.log('Freelancer dashboard - Current jobs:', jobs);
@@ -51,7 +68,6 @@ const FreelancerDasboard = () => {
   }, [jobs, isLoading, error]);
 
   useEffect(() => {
-    console.log(isNewFreelanceUser);
     if (isNewFreelanceUser) {
       navigate(ApplicationRoutes.FREELANCER_SETUP);
     }
@@ -64,9 +80,38 @@ const FreelancerDasboard = () => {
     }
   }, [isConnected, refetch]);
 
+  const handleConnect = async () => {
+    try {
+      setAuthError(null);
+      await connect();
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+      setAuthError('Failed to connect to Xion wallet. Please try again.');
+    }
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error);
+    }
+  };
+
   const handleForceRefetch = () => {
+    if (!isConnected) {
+      setAuthError('Please connect your wallet to fetch jobs');
+      return;
+    }
     console.log('Manually triggering job refetch');
     refetch();
+  };
+
+  const handleViewJobDetails = (job: any) => {
+    setSelectedJob(job);
+    if (jobDetailsBtn.current) {
+      jobDetailsBtn.current.click();
+    }
   };
 
   const filteredJobs = searchTerm
@@ -82,7 +127,7 @@ const FreelancerDasboard = () => {
       <main className='mt-32 mb-20'>
         <div className='app-container grid grid-cols-12 gap-x-3'>
           <div className='bg-white shadow-md h-[110vh] overflow-hidden rounded-lg col-span-8 p-6 px-8'>
-            <div className='pb-10'>
+            <div className='pb-6'>
               <div className='relative'>
                 <LucideSearch
                   className='absolute text-[#545756] top-1/2 -translate-y-1/2 left-6'
@@ -96,21 +141,52 @@ const FreelancerDasboard = () => {
                 />
               </div>
 
-              {process.env.NODE_ENV === 'development' && (
-                <div className='mt-4'>
-                  <Button
-                    onClick={handleForceRefetch}
-                    size='sm'
-                    variant='outline'
-                    className='bg-gray-100'
-                  >
-                    Debug: Refresh Jobs
-                  </Button>
+              <div className='mt-4 flex items-center justify-between'>
+                <div className='flex items-center space-x-2'>
+                  {isConnected && (
+                    <>
+                      <div className='flex items-center px-3 py-1 bg-green-50 rounded-lg'>
+                        <span className='inline-block w-2 h-2 rounded-full bg-green-500 mr-2'></span>
+                        <span className='text-sm text-green-800'>
+                          Xion Connected
+                        </span>
+                      </div>
+                      <XionBalance className='text-[#545756] ml-2' />
+                    </>
+                  )}
                 </div>
+
+                <div className='flex items-center gap-2'>
+                  {isConnected ? (
+                    <Button
+                      onClick={handleForceRefetch}
+                      size='sm'
+                      variant='outline'
+                      className='bg-gray-100'
+                    >
+                      Refresh Jobs
+                    </Button>
+                  ) : (
+                    <ConnectionPrompt
+                      compact={true}
+                      onConnectionChange={(status) => {
+                        if (status) refetch();
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {authError && (
+                <Alert className='mt-4 bg-red-50 border-red-200'>
+                  <AlertDescription className='text-red-800'>
+                    {authError}
+                  </AlertDescription>
+                </Alert>
               )}
             </div>
 
-            <div className='divide-y divide-gray-300 flex flex-col gap-y-10 pt-4 h-[90vh] overflow-y-auto custom-scrollbar pb-20'>
+            <div className='divide-y divide-gray-300 flex flex-col gap-y-10 pt-4 h-[80vh] overflow-y-auto custom-scrollbar pb-20'>
               {!isConnected ? (
                 <div className='flex flex-col items-center justify-center py-10'>
                   <NoJobIcon />
@@ -138,6 +214,7 @@ const FreelancerDasboard = () => {
                     key={`job-${index}-${post.role || 'undefined'}`}
                     data={post}
                     jobDetailsModal={jobDetailsBtn}
+                    onViewDetails={() => handleViewJobDetails(post)}
                   />
                 ))
               ) : (
@@ -274,7 +351,7 @@ const FreelancerDasboard = () => {
 
         <SheetContent
           side='bottom'
-          className='h-[90vh] custom-scrollbar max-w-screen-lg  mx-auto rounded-2xl mb-10 bg-white font-circular'
+          className='h-[90vh] custom-scrollbar max-w-screen-lg mx-auto rounded-2xl mb-10 bg-white font-circular'
         >
           <SheetHeader>
             <SheetDescription className='hidden'>
@@ -287,11 +364,24 @@ const FreelancerDasboard = () => {
               <SheetClose>
                 <LucideMoveLeft size={20} />
               </SheetClose>
-              <Link to={ApplicationRoutes.JOB_APPLY}>
-                <Button className='text-white bg-primary rounded-md font-circular'>
-                  Apply for job
+              {isConnected ? (
+                <Link
+                  to={`${ApplicationRoutes.JOB_APPLY}/${
+                    selectedJob?.id || '1'
+                  }`}
+                >
+                  <Button className='text-white bg-primary rounded-md font-circular'>
+                    Apply for job
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  onClick={handleConnect}
+                  className='text-white bg-primary rounded-md font-circular'
+                >
+                  Connect Wallet to Apply
                 </Button>
-              </Link>
+              )}
             </div>
 
             <div className='font-circular h-[70vh] overflow-auto custom-scrollbar'>
