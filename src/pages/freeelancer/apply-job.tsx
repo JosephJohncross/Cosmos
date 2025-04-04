@@ -132,7 +132,7 @@ const ApplyForJobPage = () => {
                                             />
 
                                             <FormItem>
-                                                <FormLabel className="text-[#545756] font-circular font-normal">ATOM wallet address</FormLabel>
+                                                <FormLabel className="text-[#545756] font-circular font-normal">XION wallet address</FormLabel>
 
                                                 <FormControl>
                                                     <div className="relative">

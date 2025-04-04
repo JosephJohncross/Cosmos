@@ -121,7 +121,7 @@ const ClientDashboard = () => {
 
   const handlePostJob = async (jobData: any) => {
     if (!isConnected || !address) {
-      alert('Please connect your wallet with Xion Abstraction first');
+      alert('Please connect  with Xion Abstraction first');
       return;
     }
 

@@ -86,7 +86,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
 
           {!isConnected && (
             <div className='mb-6 p-4 bg-yellow-50 rounded-md text-yellow-800 w-full max-w-md text-center'>
-              Please connect your wallet to publish your job
+              Please join to publish your job
             </div>
           )}
 

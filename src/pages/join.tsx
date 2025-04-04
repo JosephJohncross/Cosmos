@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-  } from "../components/ui/dialog"
+} from "../components/ui/dialog"
 import LaptopIcon from "../components/icons/join/laptop"
 import { useLocation } from "react-router-dom"
 import { ApplicationRoutes } from "../routes/routes-constant"
