@@ -53,7 +53,7 @@ const BudgetSection = ({handleBack, handleNext} : BudgetSectionProps) => {
                                         <FormItem>
                                             <FormControl>
                                                 <div className="relative ">
-                                                    <p className="absolute right-2 top-1/2 -translate-y-1/2 text-sm"><span className="text-base">ATOM </span></p>
+                                                    <p className="absolute right-2 top-1/2 -translate-y-1/2 text-sm"><span className="text-base">XION </span></p>
                                                     <Input className="bg-white text-[#7E8082] pr-16 text-base border-gray-300 font-circular placeholder:text-[#BEBEBE] text-right" placeholder="0.0" {...field} />
                                                 </div>
                                             </FormControl>
@@ -65,7 +65,7 @@ const BudgetSection = ({handleBack, handleNext} : BudgetSectionProps) => {
                                 <div className="flex text-sm items-center justify-end space-x-2">
                                     <p className=" text-[#FB822F] mr-3">Service fee:</p>
                                     <p className="text-[#7E8082] font-medium">0.00</p>
-                                    <p className="">ATOM</p>
+                                    <p className="">XION</p>
                                 </div>
                             </div>
                         </div>
@@ -84,7 +84,7 @@ const BudgetSection = ({handleBack, handleNext} : BudgetSectionProps) => {
                                         <FormItem>
                                             <FormControl>
                                                 <div className="relative ">
-                                                    <p className="absolute right-2 top-1/2 -translate-y-1/2 text-sm"><span className="text-base">ATOM </span>/hr</p>
+                                                    <p className="absolute right-2 top-1/2 -translate-y-1/2 text-sm"><span className="text-base">XION </span>/hr</p>
                                                     <Input disabled className="bg-white disabled:bg-gray-200 text-[#7E8082] pr-24 text-base border-gray-300 font-circular placeholder:text-[#BEBEBE] text-right" placeholder="0.0" {...field} />
                                                 </div>
                                             </FormControl>

@@ -59,7 +59,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
         );
       }
 
-      // Format budget as integer (atoms) - remove decimals
+      // Format budget as integer (XIONs) - remove decimals
       let budgetStr = '0';
       if (formData.budget) {
         // Parse the budget as a number first
@@ -163,7 +163,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
           </div>
           <div>
             <span className='font-medium'>Budget:</span>{' '}
-            {formData?.budget || 'Not specified'} ATOM
+            {formData?.budget || 'Not specified'} XION
           </div>
           <div>
             <span className='font-medium'>Duration:</span>{' '}

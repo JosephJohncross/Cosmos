@@ -88,8 +88,8 @@ export const formatJobForDisplay = (job: any) => {
     duration: job.duration || '1-3 weeks',
     location: job.location || 'Remote',
     timePosted: formatTimePosted(job.created_at),
-    funding: `${budgetStr} ATOM`,
-    hourlyPay: `${hourlyRate} ATOM/hr`,
+    funding: `${budgetStr} XION`,
+    hourlyPay: `${hourlyRate} XION/hr`,
     applicants: '0 to 5',
     verified: true,
   };

@@ -464,7 +464,7 @@ const FreelancerDashboard = () => {
             <div className='max-w-80 flex justify-center'>
               <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
                 You're about to receive{' '}
-                <span className='text-[#18181B] font-medium'>50.5 ATOM</span>{' '}
+                <span className='text-[#18181B] font-medium'>50.5 XION</span>{' '}
                 for Web Design. Once confirmed, the payment will be sent to your
                 wallet.
               </span>
@@ -472,7 +472,7 @@ const FreelancerDashboard = () => {
 
             <AcceptPayment className='scale-75' />
             <span className='text-base text-[#7E8082]'>
-              Receiving <span className='text-lg text-black'>50.5 ATOM</span>
+              Receiving <span className='text-lg text-black'>50.5 XION</span>
             </span>
 
             <div className=''>

@@ -87,7 +87,7 @@ const SubmitDetails = ({setActiveStep}: SubmitDetailsProps) => {
 
                                 <div className="rounded-lg border border-[#E4E4E7] p-4">
                                 <div className="flex justify-between mb-2 items-center">
-                                    <p className="font-medium text-[#545756] font-circular text-lg">5 ATOM</p>
+                                    <p className="font-medium text-[#545756] font-circular text-lg">5 XION</p>
                                     <div onClick={()=> {setActiveStep(6)}} className="">
                                         <PencilEdit className=""/>
                                     </div>

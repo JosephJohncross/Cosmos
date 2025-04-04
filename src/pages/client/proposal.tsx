@@ -193,7 +193,7 @@ const ProposalPage = () => {
 
                   <div className='flex justify-between mt-4'>
                     <div className='flex flex-col items-center'>
-                      <p className='text-sm font-medium'>3 ATOM/hr</p>
+                      <p className='text-sm font-medium'>3 XION/hr</p>
                       <p className='text-[#7E8082] text-xs font-normal'>Rate</p>
                     </div>
 

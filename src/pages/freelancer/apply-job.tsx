@@ -228,7 +228,7 @@ const ApplyForJobPage = () => {
                   name='bidAmount'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bid Amount (ATOM)</FormLabel>
+                      <FormLabel>Bid Amount (XION)</FormLabel>
                       <FormControl>
                         <Input
                           type='number'

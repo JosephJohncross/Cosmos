@@ -31,7 +31,7 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
@@ -41,7 +41,7 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
@@ -51,7 +51,7 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
@@ -61,7 +61,7 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
@@ -449,14 +449,14 @@ const ClientDashboard = () => {
             <div className='max-w-80 flex justify-center mb-5'>
               <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
                 You’re about to pay Onest Man{' '}
-                <span className='text-[#18181B] font-medium'>50.5 ATOM</span>{' '}
+                <span className='text-[#18181B] font-medium'>50.5 XION</span>{' '}
                 for Web Design. Once confirmed, the payment will be sent.
               </span>
             </div>
 
             <img src='/images/client/client.png' alt='client' />
             <span className='text-base text-[#7E8082]'>
-              Sending <span className='text-lg text-black'>50.5 ATOM</span>
+              Sending <span className='text-lg text-black'>50.5 XION</span>
             </span>
 
             <div className=''>
@@ -540,7 +540,7 @@ const ClientDashboard = () => {
 
             <div className='max-w-80'>
               <p className='font-circular text-[#545756] text-base text-center mt-5'>
-                Your payment of 50.5 ATOM has been successfully sent to Onest
+                Your payment of 50.5 XION has been successfully sent to Onest
                 Man. Thank you for completing the transaction!
               </p>
             </div>
