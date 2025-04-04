@@ -23,6 +23,7 @@ import XionWalletConnect from '../../components/xion/XionWalletConnect';
 import XionBalance from '../../components/xion/XionBalance';
 import ConnectionPrompt from '../../components/xion/ConnectionPrompt';
 import { ApplicationRoutes } from '../../routes/routes-constant';
+import { useJobContract } from '../../hooks/useJobContract';
 
 const dummyClient: ExpertCardType[] = [
   {
@@ -30,7 +31,7 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
@@ -40,7 +41,7 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
@@ -50,7 +51,7 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
@@ -60,40 +61,10 @@ const dummyClient: ExpertCardType[] = [
       'I am a highly creative designer with over three years of experience in the design industry. I have a deep understanding...',
     jobs: 55,
     name: 'Onest Man',
-    rate: '3 ATOM/hr',
+    rate: '3 XION/hr',
     rating: 4.9,
     title: 'UIUX Designer, Illustrator, Motion & Brand Designer',
     location: 'Nigeria',
-  },
-];
-
-const dummyPostings: ProjectListingComponentType[] = [
-  {
-    applicants: '5 to 10',
-    detail:
-      'Our web designer is responsible for creating the visual layout and aesthetic of a website, including its overall design, user interface (UI), and user experience (UX), by utilizing graphic design principles in Figma, Illustrator and Photoshop and coding languages like HTML....',
-    duration: '1 10 3 weeks',
-    funding: '50.5 ATOM',
-    hourlyPay: '2.5 ATOM',
-    location: 'Canada',
-    role: 'Web Designer - UIUX',
-    skills: ['Web Design', 'UIUX Design', 'Prototyping'],
-    timePosted: '3 hours',
-    verified: true,
-  },
-
-  {
-    applicants: '5 to 10',
-    detail:
-      'Our web designer is responsible for creating the visual layout and aesthetic of a website, including its overall design, user interface (UI), and user experience (UX), by utilizing graphic design principles in Figma, Illustrator and Photoshop and coding languages like HTML....',
-    duration: '1 10 3 weeks',
-    funding: '50.5 ATOM',
-    hourlyPay: '2.5 ATOM',
-    location: 'Canada',
-    role: 'Brand Ambassador',
-    skills: ['Web Design', 'UIUX Design', 'Prototyping'],
-    timePosted: '3 hours',
-    verified: false,
   },
 ];
 
@@ -110,6 +81,14 @@ const ClientDashboard = () => {
   const [txError, setTxError] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState(false);
 
+  const { jobs, isLoading, error: jobError, refetch } = useJobContract();
+
+  useEffect(() => {
+    console.log('Client dashboard - Current jobs:', jobs);
+    console.log('Client dashboard - Jobs loading state:', isLoading);
+    console.log('Client dashboard - Jobs error state:', jobError);
+  }, [jobs, isLoading, jobError]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -117,7 +96,11 @@ const ClientDashboard = () => {
   useEffect(() => {
     console.log('Dashboard detected connection change:', isConnected);
     setConnectionStatus(isConnected);
-  }, [isConnected]);
+    if (isConnected) {
+      console.log('Wallet connected, fetching jobs...');
+      refetch();
+    }
+  }, [isConnected, refetch]);
 
   const handlePostJob = async (jobData: any) => {
     if (!isConnected || !address) {
@@ -160,12 +143,19 @@ const ClientDashboard = () => {
     }
   };
 
+  const handleForceRefetch = () => {
+    console.log('Manually triggering job refetch');
+    refetch();
+  };
+
+  // Always show post job button when connected
+  const showPostJobButton = isConnected;
+
   return (
     <>
       <main className='mt-32 mb-20'>
         <div className='app-container'>
           <div className='flex justify-between items-center mb-5'>
-            {/* Balance display - only show when connected */}
             <div className='flex items-center'>
               {isConnected && (
                 <div className='flex items-center gap-2'>
@@ -180,7 +170,7 @@ const ClientDashboard = () => {
               )}
             </div>
 
-            {hasJob && isConnected && (
+            {showPostJobButton && (
               <Link to={ApplicationRoutes.POST_A_JOB}>
                 <Button className='flex items-center text-white space-x-2'>
                   <LucidePlus size={20} />
@@ -192,34 +182,25 @@ const ClientDashboard = () => {
             )}
           </div>
 
-          {/* ALWAYS show the ConnectionPrompt, let it handle the display logic */}
           <div className='mt-4 mb-5'>
             <ConnectionPrompt
               onConnectionChange={(connected) => setConnectionStatus(connected)}
             />
-
-            {/* Fallback disconnect button in case the component doesn't update */}
-            {isConnected && !connectionStatus && (
-              <div className='mt-3 bg-green-100 p-3 rounded-md'>
-                <p className='text-sm text-green-700'>
-                  Wallet successfully connected!
-                </p>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className='mt-2 border-red-200 text-red-600 hover:bg-red-50'
-                  onClick={() => {
-                    const { disconnect } = useXionWallet();
-                    disconnect();
-                  }}
-                >
-                  <span className='mr-2'>⏻</span> Disconnect Wallet
-                </Button>
-              </div>
-            )}
           </div>
 
-          {/* Transaction feedback */}
+          {/* {process.env.NODE_ENV === 'development' && (
+            <div className='mb-4'>
+              <Button
+                onClick={handleForceRefetch}
+                size='sm'
+                variant='outline'
+                className='bg-gray-100'
+              >
+                Debug: Refresh Jobs
+              </Button>
+            </div>
+          )} */}
+
           {txResult && (
             <div className='mt-4 p-4 bg-green-100 rounded-md mb-4'>
               <p className='text-green-800 font-medium'>
@@ -270,14 +251,41 @@ const ClientDashboard = () => {
                 Project Overview
               </div>
 
-              {!hasJob ? (
+              {!isConnected ? (
                 <div className='pt-20 flex flex-col items-center font-circular'>
                   <NoPostIcon className='scale-90' />
-
                   <p className='text-[#545756] my-9'>
-                    No active job posts or contracts at the moment.
+                    Please connect your wallet to view job posts
                   </p>
-
+                  <ConnectionPrompt compact={true} />
+                </div>
+              ) : isLoading ? (
+                <div className='flex items-center justify-center py-10'>
+                  <p className='text-gray-500'>Loading jobs...</p>
+                </div>
+              ) : jobError ? (
+                <div className='flex flex-col items-center justify-center py-10'>
+                  <p className='text-red-500 mb-3'>Error: {jobError}</p>
+                  <Button onClick={refetch} variant='outline' size='sm'>
+                    Try Again
+                  </Button>
+                </div>
+              ) : jobs && jobs.length > 0 ? (
+                <div className='divide-y divide-gray-300 flex flex-col gap-y-10 pt-8 h-[70vh] overflow-y-auto custom-scrollbar pb-20'>
+                  {jobs.map((post, index) => (
+                    <PostJobCard
+                      key={`job-${index}-${post.role || 'undefined'}`}
+                      data={post}
+                      editJob={editJob}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className='pt-20 flex flex-col items-center font-circular'>
+                  <NoPostIcon className='scale-90' />
+                  <p className='text-[#545756] my-9'>
+                    No active job posts found. Try posting a new job!
+                  </p>
                   <Link to={ApplicationRoutes.POST_A_JOB} className=''>
                     <Button className='flex items-center text-primary bg-white space-x-3 border border-primary rounded-md hover:bg-white focus:bg-white'>
                       <LucidePlus size={19} />
@@ -285,16 +293,10 @@ const ClientDashboard = () => {
                     </Button>
                   </Link>
                 </div>
-              ) : (
-                <div className='divide-y divide-gray-300 flex flex-col gap-y-10 pt-8 h-[70vh] overflow-y-auto custom-scrollbar pb-20'>
-                  {dummyPostings.map((post, index) => {
-                    return <PostJobCard data={post} editJob={editJob} />;
-                  })}
-                </div>
               )}
             </div>
 
-            <div className='col-span-4  pb-10 overflow-y-auto custom-scrollbar flex flex-col gap-y-6 font-circular'>
+            <div className='col-span-4 pb-10 overflow-y-auto custom-scrollbar flex flex-col gap-y-6 font-circular'>
               <div className='bg-white rounded-lg shadow-md min-h-52'>
                 <div className='border-b border-gray-200 p-4 text-[#7E8082] font-medium text-lg'>
                   Notifications
@@ -345,15 +347,15 @@ const ClientDashboard = () => {
                     <path
                       d='M16.5 7.5L6 18'
                       stroke='white'
-                      stroke-width='1.5'
-                      stroke-linecap='round'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
                     />
                     <path
                       d='M8 6.18791C8 6.18791 16.0479 5.50949 17.2692 6.73079C18.4906 7.95209 17.812 16 17.812 16'
                       stroke='white'
-                      stroke-width='1.5'
-                      stroke-linecap='round'
-                      stroke-linejoin='round'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
                     />
                   </svg>
                 </Button>
@@ -371,8 +373,8 @@ const ClientDashboard = () => {
                       fill='url(#paint0_linear_230_660)'
                     />
                     <path
-                      fill-rule='evenodd'
-                      clip-rule='evenodd'
+                      fillRule='evenodd'
+                      clipRule='evenodd'
                       d='M35.3833 64.3965C33.3949 61.1257 33.658 56.7622 36.5726 53.8476C37.5267 52.8935 39.052 52.8718 39.9795 53.7994C40.9071 54.7269 40.8855 56.2522 39.9313 57.2063C38.6035 58.5342 38.4894 60.9471 40.1389 62.5966L41.8182 64.276L40.0906 66.0036C38.7628 67.3315 38.6487 69.7444 40.2983 71.3941C41.9478 73.0436 44.3608 72.9294 45.6886 71.6016C46.6428 70.6475 48.1681 70.6258 49.0956 71.5534C50.0231 72.4809 50.0015 74.0062 49.0474 74.9604C45.6046 78.4031 40.1402 78.1463 36.8432 74.8493C34.0628 72.0689 33.4443 67.7472 35.3833 64.3965ZM53.8003 39.9786C52.8727 39.0511 52.8943 37.5259 53.8485 36.5716C56.7631 33.6571 61.1266 33.3941 64.3973 35.3824C67.7481 33.4434 72.0698 34.0619 74.8501 36.8423C78.1472 40.1393 78.4041 45.6037 74.9612 49.0466C74.0071 50.0006 72.4819 50.0222 71.5543 49.0947C70.6268 48.1671 70.6483 46.6419 71.6024 45.6878C72.9303 44.3599 73.0445 41.9469 71.395 40.2974C69.7454 38.6477 67.3324 38.7619 66.0044 40.0898C65.0503 41.0439 63.5251 41.0655 62.5976 40.1379C60.9481 38.4884 58.5351 38.6026 57.2073 39.9304C56.2531 40.8846 54.7278 40.9062 53.8003 39.9786ZM43.4348 50.3441C44.3889 49.3901 45.9141 49.3685 46.8416 50.296L55.2385 58.6929C56.1661 59.6205 56.1445 61.1457 55.1905 62.0998C54.2362 63.054 52.7109 63.0756 51.7834 62.1481L43.3865 53.7512C42.459 52.8236 42.4806 51.2983 43.4348 50.3441ZM50.345 43.4339C51.2992 42.4797 52.8245 42.4581 53.752 43.3857L57.1108 46.7444C58.0383 47.672 58.0168 49.1972 57.0625 50.1514C56.1085 51.1055 54.5832 51.1271 53.6557 50.1995L50.2969 46.8408C49.3694 45.9132 49.3909 44.388 50.345 43.4339Z'
                       fill='url(#paint1_linear_230_660)'
                     />
@@ -385,8 +387,8 @@ const ClientDashboard = () => {
                         y2='44.3257'
                         gradientUnits='userSpaceOnUse'
                       >
-                        <stop stop-color='#8C57E8' />
-                        <stop offset='1' stop-color='#F146C0' />
+                        <stop stopColor='#8C57E8' />
+                        <stop offset='1' stopColor='#F146C0' />
                       </linearGradient>
                       <linearGradient
                         id='paint1_linear_230_660'
@@ -396,9 +398,9 @@ const ClientDashboard = () => {
                         y2='62.0034'
                         gradientUnits='userSpaceOnUse'
                       >
-                        <stop stop-color='#8C57E8' />
-                        <stop offset='0.250784' stop-color='#F146C0' />
-                        <stop offset='1' stop-color='#FFC755' />
+                        <stop stopColor='#8C57E8' />
+                        <stop offset='0.250784' stopColor='#F146C0' />
+                        <stop offset='1' stopColor='#FFC755' />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -432,7 +434,6 @@ const ClientDashboard = () => {
         </div>
       </main>
 
-      {/* Accept pay */}
       <Dialog>
         <DialogTrigger asChild>
           <div ref={confirmPayment} className='hidden'>
@@ -448,14 +449,14 @@ const ClientDashboard = () => {
             <div className='max-w-80 flex justify-center mb-5'>
               <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
                 You’re about to pay Onest Man{' '}
-                <span className='text-[#18181B] font-medium'>50.5 ATOM</span>{' '}
+                <span className='text-[#18181B] font-medium'>50.5 XION</span>{' '}
                 for Web Design. Once confirmed, the payment will be sent.
               </span>
             </div>
 
             <img src='/images/client/client.png' alt='client' />
             <span className='text-base text-[#7E8082]'>
-              Sending <span className='text-lg text-black'>50.5 ATOM</span>
+              Sending <span className='text-lg text-black'>50.5 XION</span>
             </span>
 
             <div className=''>
@@ -485,7 +486,6 @@ const ClientDashboard = () => {
         </DialogClose>
       </Dialog>
 
-      {/* Terminate contract */}
       <Dialog>
         <DialogTrigger asChild>
           <div ref={terminateContractModal} className='hidden'>
@@ -523,7 +523,6 @@ const ClientDashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* success modal */}
       <Dialog>
         <DialogTrigger asChild>
           <div ref={paymentSuccessModal} className='hidden'>
@@ -541,7 +540,7 @@ const ClientDashboard = () => {
 
             <div className='max-w-80'>
               <p className='font-circular text-[#545756] text-base text-center mt-5'>
-                Your payment of 50.5 ATOM has been successfully sent to Onest
+                Your payment of 50.5 XION has been successfully sent to Onest
                 Man. Thank you for completing the transaction!
               </p>
             </div>
