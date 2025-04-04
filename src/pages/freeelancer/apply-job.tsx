@@ -275,7 +275,7 @@ const ApplyForJobPage = () => {
                   {!isConnected && (
                     <Alert className='mt-6 bg-yellow-50 border-yellow-200'>
                       <AlertDescription className='text-yellow-800'>
-                        Please connect your wallet to apply for this job
+                        Please connect to apply for this job
                       </AlertDescription>
                     </Alert>
                   )}
