@@ -84,13 +84,17 @@ const FreelancerProvider = ({ children }: FreelancerProviderProps) => {
     }
 
     try {
+      // Format according to contract expectations
       const msg = {
-        apply_for_job: {
-          job_id: jobId,
-          proposal: {
-            ...proposal,
-            freelancer: address,
+        SubmitProposal: {
+          job_id: parseInt(jobId),
+          bid_amount: proposal.bidAmount,
+          cover_letter: proposal.message,
+          contact_info: {
+            email: proposal.email,
+            phone: proposal.phone || '',
           },
+          freelancer_address: address,
         },
       };
 
@@ -121,8 +125,8 @@ const FreelancerProvider = ({ children }: FreelancerProviderProps) => {
 
     try {
       const query = {
-        get_jobs_by_freelancer: {
-          freelancer: address,
+        GetFreelancerJobs: {
+          freelancer_address: address,
         },
       };
 
