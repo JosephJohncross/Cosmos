@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import ClientDashboard from "./client-dashbboard"
-import ClientProvider from "../../context/client-context"
+import { ClientProvider } from "../../context/client-context"
 
 const ClientProviderWrapper = () => {
     return (
