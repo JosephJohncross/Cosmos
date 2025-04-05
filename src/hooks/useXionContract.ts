@@ -9,7 +9,7 @@ export const useXionContract = (contractAddress: string) => {
   // Generic query function
   const query = async <T>(queryMsg: Record<string, any>): Promise<T | null> => {
     if (!isConnected) {
-      setError(new Error('Wallet not connected'));
+      setError(new Error('Not connected'));
       return null;
     }
 

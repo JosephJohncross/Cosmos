@@ -32,7 +32,7 @@ const ProposalPage = () => {
     freelancerAddress: string
   ) => {
     if (!isConnected) {
-      setError('Please connect your wallet to hire this freelancer');
+      setError('Please connect to hire this freelancer');
       return;
     }
 

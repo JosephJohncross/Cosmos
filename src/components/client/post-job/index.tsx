@@ -117,7 +117,7 @@ const PostAJobSteps = () => {
             case 5:
                 return <TimelineSection handleBack={handleBack} handleNext={handleNext}/>;
             case 6:
-                return <PublishSection setActiveStep={setActiveStep}/>;
+                return <PublishSection handleBack={handleBack} setActiveStep={setActiveStep}/>;
           default:
             return "Unknown step";
         }

@@ -8,10 +8,11 @@ import { useNavigate } from 'react-router-dom';
 import { ApplicationRoutes } from '../../../routes/routes-constant';
 
 type PublishSectionProps = {
-  handleBack: () => void;
+    handleBack: () => void;
+    setActiveStep: React.Dispatch<React.SetStateAction<number>>
 };
 
-const PublishSection = ({ handleBack }: PublishSectionProps) => {
+const PublishSection = ({ handleBack, setActiveStep }: PublishSectionProps) => {
   const {
     getValues,
     formState: { isSubmitting },
@@ -217,7 +218,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
 
               {!isConnected && (
                 <div className='mb-6 p-4 bg-yellow-50 rounded-md text-yellow-800 w-full max-w-md text-center'>
-                  Please connect your wallet to publish your job
+                  Please connect to publish your job
                 </div>
               )}
 
@@ -228,7 +229,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
                   {error.includes('funds') && (
                     <p className='mt-2 text-sm'>
                       <strong>Need help?</strong> To complete this transaction,
-                      you need XION tokens in your wallet for gas fees. You can
+                      you need XION tokens for gas fees. You can
                       get XION tokens from the Xion testnet faucet.
                     </p>
                   )}

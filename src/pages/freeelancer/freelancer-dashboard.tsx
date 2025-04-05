@@ -58,7 +58,7 @@ const FreelancerDashboard = () => {
   // Improved job fetching by querying individual job IDs
   const fetchJobs = async () => {
     if (!isConnected) {
-      setAuthError('Please connect your wallet to fetch jobs');
+      setAuthError('Please connect to fetch jobs');
       return;
     }
 
@@ -138,7 +138,7 @@ const FreelancerDashboard = () => {
 
   const handleAcceptPayment = async (jobId: string) => {
     if (!isConnected || !address) {
-      setAuthError('Please connect your wallet first');
+      setAuthError('Please connect first');
       return;
     }
 
@@ -164,7 +164,7 @@ const FreelancerDashboard = () => {
 
   const handleTerminateContract = async (jobId: string) => {
     if (!isConnected || !address) {
-      setAuthError('Please connect your wallet first');
+      setAuthError('Please connect first');
       return;
     }
 
@@ -260,7 +260,7 @@ const FreelancerDashboard = () => {
                 <div className='flex flex-col items-center justify-center py-10'>
                   <NoJobIcon />
                   <p className='text-sm mt-3 text-[#7E8082] font-normal'>
-                    Please connect your wallet to view available jobs
+                    Please connect to view available jobs
                   </p>
                   <div className='mt-4'>
                     <ConnectionPrompt compact={true} />
@@ -414,7 +414,7 @@ const FreelancerDashboard = () => {
                   onClick={handleConnect}
                   className='text-white bg-primary rounded-md font-circular'
                 >
-                  Connect Wallet to Apply
+                  Connect to Apply
                 </Button>
               )}
             </div>

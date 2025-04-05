@@ -118,7 +118,7 @@ const ApplyForJobPage = () => {
         );
       }
     } else if (!isConnected) {
-      setError('Please connect your wallet to view job details');
+      setError('Please connect to view job details');
     } else if (jobs && jobs.length === 0 && !loadingJobs && loadAttempts < 3) {
       // No jobs loaded yet, try to fetch them
       console.log('No jobs found, attempting to fetch', loadAttempts + 1);
@@ -154,7 +154,7 @@ const ApplyForJobPage = () => {
   // Function to handle job application submission
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (!isConnected || !address) {
-      setError('Please connect your wallet to apply for this job');
+      setError('Please connect to apply for this job');
       return;
     }
 

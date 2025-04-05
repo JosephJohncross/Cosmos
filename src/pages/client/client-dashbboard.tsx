@@ -255,7 +255,7 @@ const ClientDashboard = () => {
                 <div className='pt-20 flex flex-col items-center font-circular'>
                   <NoPostIcon className='scale-90' />
                   <p className='text-[#545756] my-9'>
-                    Please connect your wallet to view job posts
+                    Please connect to view job posts
                   </p>
                   <ConnectionPrompt compact={true} />
                 </div>
