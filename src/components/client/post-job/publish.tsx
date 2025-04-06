@@ -9,6 +9,7 @@ import { ApplicationRoutes } from '../../../routes/routes-constant';
 
 type PublishSectionProps = {
   handleBack: () => void;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>; // Added this property
 };
 
 const PublishSection = ({ handleBack }: PublishSectionProps) => {
