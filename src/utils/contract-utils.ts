@@ -41,6 +41,43 @@ export const buildAcceptPaymentMsg = (
   };
 };
 
+// Payment message for client to pay freelancer
+export const buildSendPaymentMsg = (
+  jobId: string | number,
+  freelancerAddress: string,
+  amount: string | number
+) => {
+  return {
+    SendPayment: {
+      job_id: typeof jobId === 'string' ? parseInt(jobId) : jobId,
+      freelancer_address: freelancerAddress,
+      amount: amount.toString(),
+    },
+  };
+};
+
+// Release payment from escrow
+export const buildReleaseEscrowPaymentMsg = (
+  jobId: string | number,
+  freelancerAddress: string
+) => {
+  return {
+    ReleaseEscrow: {
+      job_id: typeof jobId === 'string' ? parseInt(jobId) : jobId,
+      freelancer_address: freelancerAddress,
+    },
+  };
+};
+
+// Check payment status
+export const buildGetPaymentStatusQuery = (jobId: string | number) => {
+  return {
+    PaymentStatus: {
+      job_id: typeof jobId === 'string' ? parseInt(jobId) : jobId,
+    },
+  };
+};
+
 // Standard method to terminate a contract
 export const buildTerminateContractMsg = (
   jobId: string | number,
@@ -92,6 +129,10 @@ export const formatJobForDisplay = (job: any) => {
     hourlyPay: `${hourlyRate} XION/hr`,
     applicants: '0 to 5',
     verified: true,
+    status: job.status,
+    freelancer_address: job.freelancer_address,
+    client_address: job.owner,
+    payment_status: job.payment_status,
   };
 };
 
