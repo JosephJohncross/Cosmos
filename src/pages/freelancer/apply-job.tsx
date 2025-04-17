@@ -89,7 +89,7 @@ const ApplyForJobPage = () => {
       if (!isConnected || !jobId) {
         setIsLoading(false);
         if (!isConnected) {
-          setError('Please connect your wallet to view job details');
+          setError('Please connect to view job details');
         } else if (!jobId) {
           setError('Invalid job ID');
         }
@@ -134,7 +134,7 @@ const ApplyForJobPage = () => {
   // Simplified submit function
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (!isConnected || !address) {
-      setError('Please connect your wallet to apply for this job');
+      setError('Please connect to apply for this job');
       return;
     }
 
@@ -228,7 +228,7 @@ const ApplyForJobPage = () => {
                   name='bidAmount'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bid Amount (ATOM)</FormLabel>
+                      <FormLabel>Bid Amount (XION)</FormLabel>
                       <FormControl>
                         <Input
                           type='number'

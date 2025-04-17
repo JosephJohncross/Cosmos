@@ -34,7 +34,7 @@ const FreelancerProvider = ({ children }: FreelancerProviderProps) => {
     if (!isConnected) {
       toast({
         title: 'Not connected',
-        description: 'Please connect your wallet to submit a job',
+        description: 'Please join to submit a job',
         variant: 'destructive',
       });
       return false;
@@ -77,7 +77,7 @@ const FreelancerProvider = ({ children }: FreelancerProviderProps) => {
     if (!isConnected) {
       toast({
         title: 'Not connected',
-        description: 'Please connect your wallet to apply for this job',
+        description: 'Please connect to apply for this job',
         variant: 'destructive',
       });
       return false;

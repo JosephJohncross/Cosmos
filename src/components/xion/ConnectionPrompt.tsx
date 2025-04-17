@@ -12,8 +12,8 @@ interface ConnectionPromptProps {
 }
 
 const ConnectionPrompt: React.FC<ConnectionPromptProps> = ({
-  title = 'Wallet Not Connected',
-  description = 'Please connect your wallet with Xion Abstraction to access all features and interact with blockchain contracts.',
+  title = 'Not Connected',
+  description = 'Please connect with Xion Abstraction to access all features and interact with blockchain contracts.',
   showLogo = true,
   className = '',
   compact = false,

@@ -32,7 +32,7 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!isConnected) {
       toast({
         title: 'Not connected',
-        description: 'Please connect your wallet to post a job',
+        description: 'Please connect to post a job',
         variant: 'destructive',
       });
       return false;
@@ -76,7 +76,7 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!isConnected) {
       toast({
         title: 'Not connected',
-        description: 'Please connect your wallet to accept this proposal',
+        description: 'Please connect to accept this proposal',
         variant: 'destructive',
       });
       return false;

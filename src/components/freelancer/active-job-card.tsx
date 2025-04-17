@@ -34,7 +34,7 @@ const ActiveJobCard = ({
           <div className='flex justify-between items-center font-circular space-x-5'>
             <p className=' text-sm text-[#545756]'>{jobData.title}</p>
             <span className='text-[#7E8082] text-sm '>
-              <span className='text-[#18181B]'>{jobData.amount}</span> ATOM
+              <span className='text-[#18181B]'>{jobData.amount}</span> XION
             </span>
           </div>
 

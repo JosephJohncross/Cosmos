@@ -1,11 +1,13 @@
+import { Link } from "react-router-dom"
 import Logo from "../icons/main-logo"
+import { ApplicationRoutes } from "../../routes/routes-constant"
 
 const HeaderStart = () => {
     return (
         <>
-            <div className="">
+            <Link to={ApplicationRoutes.HOME} className="">
                 <Logo className=""/>
-            </div>
+            </Link>
         </>
     )
 }

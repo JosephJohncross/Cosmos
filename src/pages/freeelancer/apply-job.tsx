@@ -98,7 +98,7 @@ const ApplyForJobPage = () => {
           role: job.title || 'Untitled Job',
           location: job.location || 'Remote',
           applicants: '0 to 5',
-          funding: `${job.budget || '0'} ATOM`,
+          funding: `${job.budget || '0'} XION`,
           hourlyPay: calculateHourlyRate(job.budget || '0', job.duration || ''),
         });
       } else if (loadAttempts < 3) {
@@ -118,7 +118,7 @@ const ApplyForJobPage = () => {
         );
       }
     } else if (!isConnected) {
-      setError('Please connect your wallet to view job details');
+      setError('Please connect to view job details');
     } else if (jobs && jobs.length === 0 && !loadingJobs && loadAttempts < 3) {
       // No jobs loaded yet, try to fetch them
       console.log('No jobs found, attempting to fetch', loadAttempts + 1);
@@ -154,7 +154,7 @@ const ApplyForJobPage = () => {
   // Function to handle job application submission
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (!isConnected || !address) {
-      setError('Please connect your wallet to apply for this job');
+      setError('Please connect to apply for this job');
       return;
     }
 
@@ -275,7 +275,7 @@ const ApplyForJobPage = () => {
                   {!isConnected && (
                     <Alert className='mt-6 bg-yellow-50 border-yellow-200'>
                       <AlertDescription className='text-yellow-800'>
-                        Please connect your wallet to apply for this job
+                        Please connect to apply for this job
                       </AlertDescription>
                     </Alert>
                   )}
@@ -342,12 +342,12 @@ const ApplyForJobPage = () => {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel className='text-[#545756] font-circular font-normal'>
-                                Bid Amount (ATOM)
+                                Bid Amount (XION)
                               </FormLabel>
 
                               <FormControl>
                                 <Input
-                                  placeholder='Enter your bid in ATOM'
+                                  placeholder='Enter your bid in XION'
                                   className='bg-[#F4F4F5] placeholder:font-circular border-gray-300 font-circular placeholder:text-[#7E8082]'
                                   type='number'
                                   min='0.1'
@@ -383,7 +383,7 @@ const ApplyForJobPage = () => {
 
                         <FormItem>
                           <FormLabel className='text-[#545756] font-circular font-normal'>
-                            ATOM wallet address
+                            XION wallet address
                           </FormLabel>
 
                           <FormControl>
@@ -475,7 +475,7 @@ const ApplyForJobPage = () => {
                           </svg>
                           <p className='text-[#7E8082]'>Funding</p>
                           <p className='text-[#545756] font-medium'>
-                            {jobDetails?.funding || '50 ATOM'}
+                            {jobDetails?.funding || '50 XION'}
                           </p>
                         </div>
 

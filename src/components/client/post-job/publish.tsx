@@ -12,7 +12,7 @@ type PublishSectionProps = {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>; // Added this property
 };
 
-const PublishSection = ({ handleBack }: PublishSectionProps) => {
+const PublishSection = ({ handleBack, setActiveStep }: PublishSectionProps) => {
   const {
     getValues,
     formState: { isSubmitting },
@@ -30,7 +30,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
 
   const handlePublish = async () => {
     if (!isConnected || !address) {
-      setError('Please connect your wallet to publish your job');
+      setError('Please join to publish your job');
       return;
     }
 
@@ -60,7 +60,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
         );
       }
 
-      // Format budget as integer (atoms) - remove decimals
+      // Format budget as integer (XIONs) - remove decimals
       let budgetStr = '0';
       if (formData.budget) {
         // Parse the budget as a number first
@@ -164,7 +164,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
           </div>
           <div>
             <span className='font-medium'>Budget:</span>{' '}
-            {formData?.budget || 'Not specified'} ATOM
+            {formData?.budget || 'Not specified'} XION
           </div>
           <div>
             <span className='font-medium'>Duration:</span>{' '}
@@ -218,7 +218,7 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
 
               {!isConnected && (
                 <div className='mb-6 p-4 bg-yellow-50 rounded-md text-yellow-800 w-full max-w-md text-center'>
-                  Please connect your wallet to publish your job
+                  Please connect to publish your job
                 </div>
               )}
 
@@ -229,8 +229,8 @@ const PublishSection = ({ handleBack }: PublishSectionProps) => {
                   {error.includes('funds') && (
                     <p className='mt-2 text-sm'>
                       <strong>Need help?</strong> To complete this transaction,
-                      you need XION tokens in your wallet for gas fees. You can
-                      get XION tokens from the Xion testnet faucet.
+                      you need XION tokens for gas fees. You can get XION tokens
+                      from the Xion testnet faucet.
                     </p>
                   )}
                 </div>
