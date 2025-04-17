@@ -24,6 +24,23 @@ import XionBalance from '../../components/xion/XionBalance';
 import ConnectionPrompt from '../../components/xion/ConnectionPrompt';
 import { ApplicationRoutes } from '../../routes/routes-constant';
 import { useJobContract } from '../../hooks/useJobContract';
+import {
+  getJobContractAddress,
+  buildSendPaymentMsg,
+  buildTerminateContractMsg,
+} from '../../utils/contract-utils';
+import { Alert, AlertDescription } from '../../components/ui/alert';
+
+// Job interface for better type safety
+interface Job {
+  id: string;
+  title: string;
+  description?: string;
+  budget: string;
+  freelancer_address?: string;
+  status?: string;
+  payment_status?: string;
+}
 
 const dummyClient: ExpertCardType[] = [
   {
@@ -77,9 +94,12 @@ const ClientDashboard = () => {
   const paymentSuccessModal = useRef<HTMLDivElement>(null);
   const { isConnected, address, executeContract } = useXionWallet();
   const [isPosting, setIsPosting] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [txResult, setTxResult] = useState<string | null>(null);
   const [txError, setTxError] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState<string>('0');
 
   const { jobs, isLoading, error: jobError, refetch } = useJobContract();
 
@@ -148,7 +168,117 @@ const ClientDashboard = () => {
     refetch();
   };
 
-  // Always show post job button when connected
+  const selectJobForPayment = (job: any) => {
+    setSelectedJob(job);
+    if (job.budget) {
+      setPaymentAmount(job.budget.toString());
+    }
+    if (confirmPayment.current) {
+      confirmPayment.current.click();
+    }
+  };
+
+  const handleSendPayment = async () => {
+    if (!selectedJob || !isConnected || !address) {
+      setTxError('Please connect your wallet and select a job first');
+      return;
+    }
+
+    if (!selectedJob.freelancer_address) {
+      setTxError('No freelancer address found for this job');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    setTxError(null);
+
+    try {
+      const contractAddress = getJobContractAddress();
+
+      // Convert payment amount to integer (microunits) as required by the contract
+      const paymentAmountNum = parseFloat(paymentAmount);
+      const paymentAmountInteger = Math.round(
+        paymentAmountNum * 1000000
+      ).toString(); // Convert to XION microunits
+
+      console.log(
+        `Converting payment from ${paymentAmount} to ${paymentAmountInteger} microunits`
+      );
+
+      const msg = buildSendPaymentMsg(
+        selectedJob.id,
+        selectedJob.freelancer_address,
+        paymentAmountInteger // Use integer amount instead of decimal
+      );
+
+      console.log('Sending payment for job:', selectedJob.id);
+      const result = await executeContract(contractAddress, msg);
+
+      if (result) {
+        setTxResult(result.transactionHash);
+
+        if (closeConfirmPayment.current) {
+          closeConfirmPayment.current.click();
+        }
+
+        if (paymentSuccessModal.current) {
+          paymentSuccessModal.current.click();
+        }
+
+        refetch();
+      } else {
+        throw new Error('Transaction failed to execute');
+      }
+    } catch (err) {
+      console.error('Error sending payment:', err);
+      setTxError(
+        err instanceof Error ? err.message : 'Failed to process payment'
+      );
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handleTerminateContract = async () => {
+    if (!selectedJob || !isConnected || !address) {
+      setTxError('Please connect your wallet and select a job first');
+      return;
+    }
+
+    if (!selectedJob.freelancer_address) {
+      setTxError('No freelancer address found for this job');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    setTxError(null);
+
+    try {
+      const contractAddress = getJobContractAddress();
+      const msg = buildTerminateContractMsg(
+        selectedJob.id,
+        selectedJob.freelancer_address
+      );
+
+      console.log('Terminating contract for job:', selectedJob.id);
+      const result = await executeContract(contractAddress, msg);
+
+      if (result) {
+        setTxResult(result.transactionHash);
+        refetch();
+      } else {
+        throw new Error('Transaction failed to execute');
+      }
+    } catch (err) {
+      console.error('Error terminating contract:', err);
+      setTxError(
+        err instanceof Error ? err.message : 'Failed to terminate contract'
+      );
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   const showPostJobButton = isConnected;
 
   return (
@@ -187,19 +317,6 @@ const ClientDashboard = () => {
               onConnectionChange={(connected) => setConnectionStatus(connected)}
             />
           </div>
-
-          {/* {process.env.NODE_ENV === 'development' && (
-            <div className='mb-4'>
-              <Button
-                onClick={handleForceRefetch}
-                size='sm'
-                variant='outline'
-                className='bg-gray-100'
-              >
-                Debug: Refresh Jobs
-              </Button>
-            </div>
-          )} */}
 
           {txResult && (
             <div className='mt-4 p-4 bg-green-100 rounded-md mb-4'>
@@ -277,6 +394,7 @@ const ClientDashboard = () => {
                       key={`job-${index}-${post.role || 'undefined'}`}
                       data={post}
                       editJob={editJob}
+                      onSelectForPayment={() => selectJobForPayment(post)}
                     />
                   ))}
                 </div>
@@ -444,30 +562,43 @@ const ClientDashboard = () => {
         <DialogContent className='sm:max-w-[425px] bg-white font-circular'>
           <div className='flex flex-col items-center'>
             <p className='text-[20px] font-poppins font-semibold text-[#18181B] mt-5'>
-              Receive Payment
+              Make Payment
             </p>
             <div className='max-w-80 flex justify-center mb-5'>
               <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
-                You’re about to pay Onest Man{' '}
-                <span className='text-[#18181B] font-medium'>50.5 XION</span>{' '}
-                for Web Design. Once confirmed, the payment will be sent.
+                You're about to pay{' '}
+                {selectedJob?.freelancer_address && (
+                  <span className='text-[#18181B] font-medium'>
+                    {selectedJob.freelancer_address.slice(0, 12)}...
+                  </span>
+                )}{' '}
+                <span className='text-[#18181B] font-medium'>
+                  {paymentAmount} XION
+                </span>{' '}
+                for {selectedJob?.title || 'this job'}. Once confirmed, the
+                payment will be sent.
               </span>
             </div>
 
             <img src='/images/client/client.png' alt='client' />
             <span className='text-base text-[#7E8082]'>
-              Sending <span className='text-lg text-black'>50.5 XION</span>
+              Sending{' '}
+              <span className='text-lg text-black'>{paymentAmount} XION</span>
             </span>
+
+            {txError && (
+              <Alert variant='destructive' className='mt-4'>
+                <AlertDescription>{txError}</AlertDescription>
+              </Alert>
+            )}
 
             <div className=''>
               <Button
-                onClick={() => {
-                  closeConfirmPayment.current.click();
-                  paymentSuccessModal.current.click();
-                }}
+                onClick={handleSendPayment}
+                disabled={isProcessingPayment || !isConnected}
                 className='text-white w-full mt-6 px-28'
               >
-                Confirm payment
+                {isProcessingPayment ? 'Processing...' : 'Confirm payment'}
               </Button>
             </div>
             <span className='text-[#7E8082] text-sm font-normal mt-4 mb-2'>
@@ -496,7 +627,7 @@ const ClientDashboard = () => {
         <DialogContent className='sm:max-w-[425px] bg-white'>
           <div className='flex flex-col items-center'>
             <p className='text-[20px] mb-6 font-poppins font-semibold text-[#18181B] mt-5'>
-                Terminate Freelancer
+              Terminate Contract
             </p>
 
             <img src='/images/client/client.png' alt='client' />
@@ -505,7 +636,11 @@ const ClientDashboard = () => {
             <div className=' flex justify-center'>
               <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
                 Terminating this contract requires mutual agreement. Confirm to
-                notify Onest Man.
+                notify{' '}
+                {selectedJob?.freelancer_address
+                  ? selectedJob.freelancer_address.slice(0, 12) + '...'
+                  : 'the freelancer'}
+                .
               </span>
             </div>
           </div>
@@ -516,8 +651,12 @@ const ClientDashboard = () => {
                 Cancel
               </Button>
             </DialogClose>
-            <Button className='w-full mt-6 bg-[#FB822F] text-white hover:bg-[#FB822F] focus:bg-[#FB822F]'>
-              End Contract
+            <Button
+              onClick={handleTerminateContract}
+              disabled={isProcessingPayment}
+              className='w-full mt-6 bg-[#FB822F] text-white hover:bg-[#FB822F] focus:bg-[#FB822F]'
+            >
+              {isProcessingPayment ? 'Processing...' : 'End Contract'}
             </Button>
           </div>
         </DialogContent>
@@ -540,9 +679,19 @@ const ClientDashboard = () => {
 
             <div className='max-w-80'>
               <p className='font-circular text-[#545756] text-base text-center mt-5'>
-                Your payment of 50.5 XION has been successfully sent to Onest
-                Man. Thank you for completing the transaction!
+                Your payment of {paymentAmount} XION has been successfully sent
+                to{' '}
+                {selectedJob?.freelancer_address
+                  ? selectedJob.freelancer_address.slice(0, 12) + '...'
+                  : 'the freelancer'}
+                . Thank you for completing the transaction!
               </p>
+
+              {txResult && (
+                <p className='font-circular text-xs text-green-600 text-center mt-2 break-all'>
+                  Transaction Hash: {txResult}
+                </p>
+              )}
             </div>
 
             <DialogClose className=''>

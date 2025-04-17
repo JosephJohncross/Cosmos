@@ -29,15 +29,32 @@ import {
 import TerminateContract from '../../components/icons/freelance/terminate-contract';
 import AcceptPayment from '../../components/icons/freelance/accept-payment';
 import { Alert, AlertDescription } from '../../components/ui/alert';
+import ApplySuceess from '../../components/icons/freelance/apply-success';
 
 // Import the utilities
 import {
   buildGetJobDetailsQuery,
   buildAcceptPaymentMsg,
   buildTerminateContractMsg,
+  buildGetPaymentStatusQuery,
   formatJobForDisplay,
   getJobContractAddress,
 } from '../../utils/contract-utils';
+
+// Job interface for better type safety
+interface Job {
+  id: string;
+  title?: string;
+  role?: string;
+  description?: string;
+  detail?: string;
+  budget?: string;
+  funding?: string;
+  client_address?: string;
+  status?: string;
+  payment_status?: string;
+  skills?: string[];
+}
 
 const FreelancerDashboard = () => {
   const { isNewFreelanceUser } = useAuth();
@@ -45,15 +62,20 @@ const FreelancerDashboard = () => {
   const jobDetailsBtn = useRef<HTMLDivElement>(null);
   const acceptPayModal = useRef<HTMLDivElement>(null);
   const terminateModal = useRef<HTMLDivElement>(null);
+  const paymentSuccessModal = useRef<HTMLDivElement>(null);
+  const closeAcceptPayModal = useRef<HTMLDivElement>(null);
   const { isConnected, address, connect, executeContract, queryContract } =
     useXionWallet();
 
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState<string>('0');
+  const [txResult, setTxResult] = useState<string | null>(null);
 
   // Improved job fetching by querying individual job IDs
   const fetchJobs = async () => {
@@ -66,7 +88,7 @@ const FreelancerDashboard = () => {
       setIsLoading(true);
       setError(null);
       const contractAddress = getJobContractAddress();
-      const fetchedJobs = [];
+      const fetchedJobs: Job[] = [];
 
       console.log('Fetching individual job details...');
 
@@ -77,12 +99,26 @@ const FreelancerDashboard = () => {
           const result = await queryContract(contractAddress, query);
 
           if (result) {
-            fetchedJobs.push(
-              formatJobForDisplay({
-                ...result,
-                id: i.toString(),
-              })
-            );
+            const formattedJob = formatJobForDisplay({
+              ...result,
+              id: i.toString(),
+            });
+
+            // Also fetch payment status if available
+            try {
+              const paymentQuery = buildGetPaymentStatusQuery(i);
+              const paymentStatus = await queryContract(
+                contractAddress,
+                paymentQuery
+              );
+              if (paymentStatus) {
+                formattedJob.payment_status = paymentStatus.status;
+              }
+            } catch (err) {
+              console.log(`No payment status for job ${i}`);
+            }
+
+            fetchedJobs.push(formattedJob);
             console.log(`Found job ${i}:`, result);
           }
         } catch (err) {
@@ -128,9 +164,18 @@ const FreelancerDashboard = () => {
     }
   };
 
-  const handleViewJobDetails = (job: any) => {
+  const handleViewJobDetails = (job: Job) => {
     console.log('Setting selected job:', job);
     setSelectedJob(job);
+
+    // Set payment amount from job budget if available
+    if (job.funding) {
+      const amount = job.funding.replace(' XION', '');
+      setPaymentAmount(amount);
+    } else if (job.budget) {
+      setPaymentAmount(job.budget);
+    }
+
     if (jobDetailsBtn.current) {
       jobDetailsBtn.current.click();
     }
@@ -138,9 +183,17 @@ const FreelancerDashboard = () => {
 
   const handleAcceptPayment = async (jobId: string) => {
     if (!isConnected || !address) {
-      setAuthError('Please connect first');
+      setAuthError('Please connect your wallet first');
       return;
     }
+
+    if (!selectedJob) {
+      setAuthError('No job selected');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    setAuthError(null);
 
     try {
       const contractAddress = getJobContractAddress();
@@ -150,15 +203,37 @@ const FreelancerDashboard = () => {
       const result = await executeContract(contractAddress, msg);
       console.log('Payment accepted:', result);
 
-      // Success notification
-      setAuthError(null);
-      // Could add a success toast here
-      fetchJobs(); // Refresh jobs list after action
+      if (result) {
+        setTxResult(result.transactionHash);
+
+        // Close payment confirmation and show success
+        if (closeAcceptPayModal.current) {
+          closeAcceptPayModal.current.click();
+        }
+
+        if (paymentSuccessModal.current) {
+          paymentSuccessModal.current.click();
+        }
+
+        // Refresh jobs list after action
+        fetchJobs();
+      }
     } catch (err) {
       console.error('Error accepting payment:', err);
-      setAuthError(
-        err instanceof Error ? err.message : 'Failed to accept payment'
-      );
+      
+      // Handle specific fee limit error
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      
+      if (errorMessage.includes('fee limit exceeded') || 
+          errorMessage.includes('not allowed to pay fees')) {
+        setAuthError(
+          'Transaction failed: You have insufficient XION tokens to pay transaction fees. Please add more XION to your wallet.'
+        );
+      } else {
+        setAuthError(errorMessage || 'Failed to accept payment');
+      }
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -168,31 +243,40 @@ const FreelancerDashboard = () => {
       return;
     }
 
+    setIsProcessingPayment(true);
+    setAuthError(null);
+
     try {
       const contractAddress = getJobContractAddress();
       const msg = buildTerminateContractMsg(jobId, address);
 
       console.log('Terminating contract for job:', jobId);
       const result = await executeContract(contractAddress, msg);
-      console.log('Contract terminated:', result);
 
-      // Success notification
-      setAuthError(null);
-      // Could add a success toast here
-      fetchJobs(); // Refresh jobs list after action
+      if (result) {
+        console.log('Contract terminated:', result);
+        setTxResult(result.transactionHash);
+
+        // Refresh jobs data
+        fetchJobs();
+      } else {
+        throw new Error('Transaction failed to execute');
+      }
     } catch (err) {
       console.error('Error terminating contract:', err);
       setAuthError(
         err instanceof Error ? err.message : 'Failed to terminate contract'
       );
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
   const filteredJobs = searchTerm
     ? jobs.filter(
         (job) =>
-          job.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.detail.toLowerCase().includes(searchTerm.toLowerCase())
+          job.role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.detail?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : jobs;
 
@@ -464,28 +548,86 @@ const FreelancerDashboard = () => {
             <div className='max-w-80 flex justify-center'>
               <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
                 You're about to receive{' '}
-                <span className='text-[#18181B] font-medium'>50.5 XION</span>{' '}
-                for Web Design. Once confirmed, the payment will be sent to your
-                wallet.
+                <span className='text-[#18181B] font-medium'>
+                  {paymentAmount} XION
+                </span>{' '}
+                for {selectedJob?.role || 'this job'}. Once confirmed, the
+                payment will be sent to your wallet.
               </span>
             </div>
 
             <AcceptPayment className='scale-75' />
             <span className='text-base text-[#7E8082]'>
-              Receiving <span className='text-lg text-black'>50.5 XION</span>
+              Receiving{' '}
+              <span className='text-lg text-black'>{paymentAmount} XION</span>
             </span>
+
+            {authError && (
+              <Alert variant='destructive' className='mt-4'>
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
 
             <div className=''>
               <Button
                 onClick={() => handleAcceptPayment(selectedJob?.id || '1')}
+                disabled={isProcessingPayment || !isConnected}
                 className='text-white w-full mt-6 px-28'
               >
-                Accept payment
+                {isProcessingPayment ? 'Processing...' : 'Accept payment'}
               </Button>
             </div>
             <span className='text-[#7E8082] text-sm font-normal mt-4 mb-2'>
               Need help? <span className='text-primary'>Contact support.</span>
             </span>
+          </div>
+        </DialogContent>
+
+        <DialogClose className='hidden'>
+          <div
+            ref={closeAcceptPayModal}
+            className='w-full text-white px-9 mt-6 py-5 pb-6'
+          >
+            Okay
+          </div>
+        </DialogClose>
+      </Dialog>
+
+      {/* Payment Success Dialog */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <div ref={paymentSuccessModal} className='hidden'>
+            Payment Success
+          </div>
+        </DialogTrigger>
+
+        <DialogContent className='sm:max-w-[425px] bg-white'>
+          <div className='flex flex-col items-center'>
+            <ApplySuceess className='scale-75' />
+
+            <p className='text-[20px] font-poppins font-semibold text-[#18181B] mt-5'>
+              Payment Received
+            </p>
+
+            <div className='max-w-80'>
+              <p className='font-circular text-[#545756] text-base text-center mt-5'>
+                You've successfully received {paymentAmount} XION for{' '}
+                {selectedJob?.role || 'your work'}. The payment has been
+                transferred to your wallet.
+              </p>
+
+              {txResult && (
+                <p className='font-circular text-xs text-green-600 text-center mt-2 break-all'>
+                  Transaction Hash: {txResult}
+                </p>
+              )}
+            </div>
+
+            <DialogClose className=''>
+              <Button className='w-full text-white px-9 mt-6 py-5 pb-6'>
+                Okay
+              </Button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>
@@ -510,9 +652,19 @@ const FreelancerDashboard = () => {
             <div className=' flex justify-center'>
               <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
                 Terminating this contract requires mutual agreement. Confirm to
-                notify the client.
+                notify{' '}
+                {selectedJob?.client_address
+                  ? selectedJob.client_address.slice(0, 12) + '...'
+                  : 'the client'}
+                .
               </span>
             </div>
+
+            {authError && (
+              <Alert variant='destructive' className='mt-4'>
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
           </div>
 
           <div className='mb-3 flex space-x-3'>
@@ -523,9 +675,10 @@ const FreelancerDashboard = () => {
             </DialogClose>
             <Button
               onClick={() => handleTerminateContract(selectedJob?.id || '1')}
+              disabled={isProcessingPayment}
               className='w-full mt-6 bg-[#FB822F] text-white hover:bg-[#FB822F] focus:bg-[#FB822F]'
             >
-              End Contract
+              {isProcessingPayment ? 'Processing...' : 'End Contract'}
             </Button>
           </div>
         </DialogContent>

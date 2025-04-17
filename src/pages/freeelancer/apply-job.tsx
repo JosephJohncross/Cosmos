@@ -177,11 +177,20 @@ const ApplyForJobPage = () => {
 
       console.log(`Preparing proposal for job #${jobId}`);
 
+      // Convert bid amount from decimal to integer (whole XION units)
+      // The contract expects integers, not decimals like 0.1
+      const bidAmountNum = parseFloat(data.bidAmount);
+      const bidAmountInteger = Math.round(bidAmountNum * 1000000).toString(); // Convert to XION microunits
+
+      console.log(
+        `Converting bid amount from ${data.bidAmount} to ${bidAmountInteger} microunits`
+      );
+
       // Format proposal to match contract expectations - using SubmitProposal
       const proposal = {
         SubmitProposal: {
           job_id: parseInt(jobId),
-          bid_amount: data.bidAmount,
+          bid_amount: bidAmountInteger, // Use integer amount instead of decimal
           cover_letter: data.message,
           contact_info: {
             email: data.email,

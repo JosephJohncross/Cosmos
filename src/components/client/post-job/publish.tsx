@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { ApplicationRoutes } from '../../../routes/routes-constant';
 
 type PublishSectionProps = {
-    handleBack: () => void;
-    setActiveStep: React.Dispatch<React.SetStateAction<number>>
+  handleBack: () => void;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>; // Added this property
 };
 
 const PublishSection = ({ handleBack, setActiveStep }: PublishSectionProps) => {
@@ -229,8 +229,8 @@ const PublishSection = ({ handleBack, setActiveStep }: PublishSectionProps) => {
                   {error.includes('funds') && (
                     <p className='mt-2 text-sm'>
                       <strong>Need help?</strong> To complete this transaction,
-                      you need XION tokens for gas fees. You can
-                      get XION tokens from the Xion testnet faucet.
+                      you need XION tokens for gas fees. You can get XION tokens
+                      from the Xion testnet faucet.
                     </p>
                   )}
                 </div>
