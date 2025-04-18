@@ -30,6 +30,13 @@ import TerminateContract from '../../components/icons/freelance/terminate-contra
 import AcceptPayment from '../../components/icons/freelance/accept-payment';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import ApplySuceess from '../../components/icons/freelance/apply-success';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '../../components/ui/tabs';
+import AppliedJobs from '../../components/freelancer/applied-jobs';
 
 // Import the utilities
 import {
@@ -54,6 +61,8 @@ interface Job {
   status?: string;
   payment_status?: string;
   skills?: string[];
+  freelancer_address?: string;
+  assigned_freelancer?: string;
 }
 
 const FreelancerDashboard = () => {
@@ -92,17 +101,38 @@ const FreelancerDashboard = () => {
 
       console.log('Fetching individual job details...');
 
-      // Try to fetch first 10 jobs by ID (adjust as needed)
-      for (let i = 1; i <= 10; i++) {
+      // Try to fetch more jobs to ensure we get some results
+      for (let i = 1; i <= 30; i++) {
         try {
           const query = buildGetJobDetailsQuery(i);
           const result = await queryContract(contractAddress, query);
 
           if (result) {
-            const formattedJob = formatJobForDisplay({
-              ...result,
+            // Convert status to lowercase for consistent comparison - contract uses "Open"/"InProgress" etc.
+            const contractStatus = result.status
+              ? result.status.toString()
+              : 'Open';
+            // Map contract status values to frontend expected values
+            let normalizedStatus = contractStatus;
+            if (contractStatus === 'Open') normalizedStatus = 'open';
+            if (contractStatus === 'InProgress')
+              normalizedStatus = 'in_progress';
+            if (contractStatus === 'Completed') normalizedStatus = 'completed';
+            if (contractStatus === 'Cancelled') normalizedStatus = 'cancelled';
+
+            // Ensure job has proper display properties
+            const formattedJob = {
+              ...formatJobForDisplay({
+                ...result,
+                id: i.toString(),
+              }),
+              // Make sure these fields are properly defined
               id: i.toString(),
-            });
+              status: normalizedStatus, // Use normalized status
+              title: result.title || 'Untitled Job',
+              role: result.title || 'Untitled Job',
+              detail: result.description || 'No description provided',
+            };
 
             // Also fetch payment status if available
             try {
@@ -118,8 +148,8 @@ const FreelancerDashboard = () => {
               console.log(`No payment status for job ${i}`);
             }
 
+            console.log(`Found job ${i}:`, formattedJob);
             fetchedJobs.push(formattedJob);
-            console.log(`Found job ${i}:`, result);
           }
         } catch (err) {
           // Just log the error and continue with the next ID
@@ -220,12 +250,14 @@ const FreelancerDashboard = () => {
       }
     } catch (err) {
       console.error('Error accepting payment:', err);
-      
+
       // Handle specific fee limit error
       const errorMessage = err instanceof Error ? err.message : String(err);
-      
-      if (errorMessage.includes('fee limit exceeded') || 
-          errorMessage.includes('not allowed to pay fees')) {
+
+      if (
+        errorMessage.includes('fee limit exceeded') ||
+        errorMessage.includes('not allowed to pay fees')
+      ) {
         setAuthError(
           'Transaction failed: You have insufficient XION tokens to pay transaction fees. Please add more XION to your wallet.'
         );
@@ -282,179 +314,177 @@ const FreelancerDashboard = () => {
 
   return (
     <>
-      <main className='mt-32 mb-20'>
-        <div className='app-container grid grid-cols-12 gap-x-3'>
-          <div className='bg-white shadow-md h-[110vh] overflow-hidden rounded-lg col-span-8 p-6 px-8'>
-            <div className='pb-6'>
-              <div className='relative'>
-                <LucideSearch
-                  className='absolute text-[#545756] top-1/2 -translate-y-1/2 left-6'
-                  size={20}
-                />
-                <Input
-                  placeholder='Search for projects'
-                  className='w-full py-4 placeholder:text-[#BEBEBE] font-circular pl-14 bg-transparent border border-gray-300'
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+      <main className='mt-32 px-5 mb-36'>
+        <div className='max-w-screen-lg mx-auto w-full'>
+          <div className='flex items-center justify-between'>
+            <h1 className='font-poppins font-semibold text-[32px]'>
+              Job Board
+            </h1>
 
-              <div className='mt-4 flex items-center justify-between'>
-                <div className='flex items-center space-x-2'>
-                  {isConnected && (
-                    <>
-                      <div className='flex items-center px-3 py-1 bg-green-50 rounded-lg'>
-                        <span className='inline-block w-2 h-2 rounded-full bg-green-500 mr-2'></span>
-                        <span className='text-sm text-green-800'>
-                          Xion Connected
-                        </span>
-                      </div>
-                      <XionBalance className='text-[#545756] ml-2' />
-                    </>
-                  )}
-                </div>
-
-                <div className='flex items-center gap-2'>
-                  {isConnected ? (
-                    <Button
-                      onClick={fetchJobs}
-                      size='sm'
-                      variant='outline'
-                      className='bg-gray-100'
-                    >
-                      Refresh Jobs
-                    </Button>
-                  ) : (
-                    <ConnectionPrompt compact={true} />
-                  )}
-                </div>
-              </div>
-
-              {authError && (
-                <Alert className='mt-4 bg-red-50 border-red-200'>
-                  <AlertDescription className='text-red-800'>
-                    {authError}
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div>
-
-            <div className='divide-y divide-gray-300 flex flex-col gap-y-10 pt-4 h-[80vh] overflow-y-auto custom-scrollbar pb-20'>
+            <div className='flex items-center space-x-3'>
               {!isConnected ? (
-                <div className='flex flex-col items-center justify-center py-10'>
-                  <NoJobIcon />
-                  <p className='text-sm mt-3 text-[#7E8082] font-normal'>
-                    Please connect to view available jobs
-                  </p>
-                  <div className='mt-4'>
-                    <ConnectionPrompt compact={true} />
+                <Button onClick={handleConnect} className='text-white'>
+                  Connect wallet
+                </Button>
+              ) : (
+                <div className='flex items-center space-x-3'>
+                  <div className='flex items-center px-3 py-1 bg-green-50 rounded-lg'>
+                    <span className='inline-block w-2 h-2 rounded-full bg-green-500 mr-2'></span>
+                    <span className='text-sm text-green-800'>
+                      Xion Connected
+                    </span>
                   </div>
-                </div>
-              ) : isLoading ? (
-                <div className='flex items-center justify-center py-10'>
-                  <p className='text-gray-500'>Loading available jobs...</p>
-                </div>
-              ) : error ? (
-                <div className='flex flex-col items-center justify-center py-10'>
-                  <p className='text-red-500 mb-3'>Error: {error}</p>
-                  <Button onClick={fetchJobs} variant='outline' size='sm'>
-                    Try Again
+                  <XionBalance className='text-[#545756] ml-2' />
+                  <Button
+                    onClick={fetchJobs}
+                    size='sm'
+                    variant='outline'
+                    className='bg-gray-100'
+                  >
+                    Refresh Jobs
                   </Button>
                 </div>
-              ) : filteredJobs && filteredJobs.length > 0 ? (
-                filteredJobs.map((job, index) => (
-                  <ProjectListingComponent
-                    key={`job-${index}-${job.role || 'undefined'}`}
-                    data={job}
-                    jobDetailsModal={jobDetailsBtn}
-                    onViewDetails={() => handleViewJobDetails(job)}
-                  />
-                ))
-              ) : (
-                <div className='flex flex-col items-center justify-center py-10'>
-                  <NoJobIcon />
-                  <p className='text-sm mt-3 text-[#7E8082] font-normal'>
-                    {searchTerm
-                      ? 'No matching jobs found. Try a different search term.'
-                      : 'No jobs available at the moment'}
-                  </p>
-                </div>
               )}
             </div>
           </div>
 
-          {/* Rest of the dashboard UI */}
-          <div className='col-span-4  pb-10 overflow-y-auto custom-scrollbar flex flex-col gap-y-6 font-circular'>
-            {/* Notifications section */}
-            <div className='bg-white rounded-lg shadow-md min-h-52'>
-              <div className='border-b border-gray-200 p-4 text-[#7E8082] font-medium text-lg'>
-                Notifications
-              </div>
+          {authError && (
+            <Alert variant='destructive' className='mt-4'>
+              <AlertDescription>{authError}</AlertDescription>
+            </Alert>
+          )}
 
-              <div className='p-4'>
-                <NotificationCard />
-              </div>
-            </div>
+          <Tabs defaultValue='available' className='mt-8'>
+            <TabsList className='bg-[#F4F4F5] p-1'>
+              <TabsTrigger value='available' className='rounded-md'>
+                Available Jobs
+              </TabsTrigger>
+              <TabsTrigger value='applied' className='rounded-md'>
+                My Applications
+              </TabsTrigger>
+              <TabsTrigger value='active' className='rounded-md'>
+                Active Contracts
+              </TabsTrigger>
+            </TabsList>
 
-            {/* Active projects section */}
-            <div className='bg-white rounded-lg font-circular shadow-md min-h-52'>
-              <div className='border-b border-gray-200 p-4 text-[#7E8082] font-medium text-lg'>
-                Active Projects
-              </div>
+            <TabsContent value='available' className='mt-6'>
+              <div className='bg-white relative rounded-xl p-6'>
+                <div className='mt-6'>
+                  {isLoading ? (
+                    <div className='flex justify-center py-10'>
+                      <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary'></div>
+                    </div>
+                  ) : error ? (
+                    <div className='text-center py-10'>
+                      <p className='text-red-500'>{error}</p>
+                      <Button
+                        onClick={fetchJobs}
+                        className='mt-4 bg-primary text-white'
+                      >
+                        Try Again
+                      </Button>
+                    </div>
+                  ) : jobs.length === 0 ? (
+                    <div className='text-center py-10'>
+                      <p className='text-gray-500'>
+                        No jobs available at the moment.
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      {jobs
+                        .filter(
+                          (job) =>
+                            // Show jobs that are explicitly open OR have no status (which defaults to open)
+                            (job.status === 'open' || !job.status) &&
+                            // Don't show jobs assigned to this freelancer
+                            job.freelancer_address !== address &&
+                            job.assigned_freelancer !== address &&
+                            // Apply search term filter if any
+                            (searchTerm === '' ||
+                              job.role
+                                ?.toLowerCase()
+                                .includes(searchTerm.toLowerCase()) ||
+                              job.detail
+                                ?.toLowerCase()
+                                .includes(searchTerm.toLowerCase()))
+                        )
+                        .map((job) => (
+                          <ProjectListingComponent
+                            key={job.id}
+                            data={job}
+                            jobDetailsModal={jobDetailsBtn}
+                            onViewDetails={() => handleViewJobDetails(job)}
+                          />
+                        ))}
 
-              <div className='p-4'>
-                <div className=''>
-                  <ActiveJobCard
-                    acceptPayModal={acceptPayModal}
-                    terminateContract={terminateModal}
-                  />
+                      {jobs.filter(
+                        (job) =>
+                          (job.status === 'open' || !job.status) &&
+                          job.freelancer_address !== address &&
+                          job.assigned_freelancer !== address
+                      ).length === 0 && (
+                        <div className='text-center py-10'>
+                          <p className='text-gray-500'>
+                            No available jobs found matching your criteria.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
+            </TabsContent>
 
-            {/* Get started section */}
-            <div className='bg-[#18181B] rounded-lg font-circular shadow-md min-h-52 mb-20 p-8 relative'>
-              <p className='font-poppins text-white font-bold text-sm'>
-                Get started
-              </p>
-
-              <p className=' font-circular text-base text-[#F4F4F5] mt-3'>
-                Start your journey now and connect with clients to bring their
-                projects to life.
-              </p>
-
-              <Button className='flex items-center space-x-2 text-white bg-[#545756] mt-6'>
-                <p className=''>Learn more</p>
-                <svg
-                  className='scale-90'
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.5 7.5L6 18'
-                    stroke='white'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                  />
-                  <path
-                    d='M8 6.18791C8 6.18791 16.0479 5.50949 17.2692 6.73079C18.4906 7.95209 17.812 16 17.812 16'
-                    stroke='white'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              </Button>
-
-              {/* Decorative SVG */}
-              <div className='absolute bottom-0 right-0'>
-                {/* SVG Content */}
+            <TabsContent value='applied' className='mt-6'>
+              <div className='bg-white relative rounded-xl p-6'>
+                <AppliedJobs />
               </div>
-            </div>
-          </div>
+            </TabsContent>
+
+            <TabsContent value='active' className='mt-6'>
+              <div className='bg-white relative rounded-xl p-6'>
+                <div className='mt-6'>
+                  {isLoading ? (
+                    <div className='flex justify-center py-10'>
+                      <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary'></div>
+                    </div>
+                  ) : (
+                    <div>
+                      {jobs
+                        .filter(
+                          (job) =>
+                            (job.status === 'in_progress' ||
+                              job.status === 'completed') &&
+                            job.freelancer_address === address
+                        )
+                        .map((job) => (
+                          <ProjectListingComponent
+                            key={job.id}
+                            data={job}
+                            jobDetailsModal={jobDetailsBtn}
+                            onViewDetails={() => handleViewJobDetails(job)}
+                          />
+                        ))}
+
+                      {jobs.filter(
+                        (job) =>
+                          (job.status === 'in_progress' ||
+                            job.status === 'completed') &&
+                          job.freelancer_address === address
+                      ).length === 0 && (
+                        <div className='text-center py-10'>
+                          <p className='text-gray-500'>
+                            No active contracts found.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
 

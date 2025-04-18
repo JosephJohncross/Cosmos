@@ -56,6 +56,15 @@ export const buildSendPaymentMsg = (
   };
 };
 
+// Function to mark a job as complete (for freelancers)
+export const buildCompleteJobMsg = (jobId: string | number) => {
+  return {
+    CompleteJob: {
+      job_id: typeof jobId === 'string' ? parseInt(jobId) : jobId,
+    },
+  };
+};
+
 // Release payment from escrow
 export const buildReleaseEscrowPaymentMsg = (
   jobId: string | number,

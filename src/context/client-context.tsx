@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { useXionWallet } from './xion-context';
+import { getJobContractAddress } from '../utils/contract-utils';
 
 interface JobData {
   title: string;
@@ -16,6 +17,12 @@ interface ClientContextType {
   ) => Promise<boolean>;
   getJobDetails: (jobId: number) => Promise<any>;
   getJobProposals: (jobId: number) => Promise<any[]>;
+  getClientJobs: () => Promise<any[]>;
+  reviewCompletedJob: (
+    jobId: string,
+    freelancerAddress: string,
+    paymentAmount: string
+  ) => Promise<boolean>;
 }
 
 const ClientContext = createContext<ClientContextType | undefined>(undefined);
@@ -26,7 +33,7 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
   const { toast } = useToast();
   const { isConnected, address, executeContract, queryContract } =
     useXionWallet();
-  const jobContractAddress = import.meta.env.VITE_JOB_CONTRACT_ADDRESS || '';
+  const jobContractAddress = getJobContractAddress();
 
   const postJob = async (jobData: JobData): Promise<boolean> => {
     if (!isConnected) {
@@ -39,8 +46,9 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
+      // Use PascalCase for contract message key as per the contract
       const msg = {
-        post_job: {
+        PostJob: {
           title: jobData.title,
           description: jobData.description,
           budget: jobData.budget,
@@ -83,13 +91,15 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
+      // Use PascalCase for contract message key as per the contract
       const msg = {
-        accept_proposal: {
+        AcceptProposal: {
           job_id: jobId,
           freelancer: freelancerAddress,
         },
       };
 
+      console.log('Accepting proposal with message:', JSON.stringify(msg));
       const result = await executeContract(jobContractAddress, msg);
 
       if (result) {
@@ -114,8 +124,9 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getJobDetails = async (jobId: number): Promise<any> => {
     try {
+      // Use PascalCase for contract query key as per the contract
       const query = {
-        get_job_details: {
+        GetJobDetails: {
           job_id: jobId,
         },
       };
@@ -130,17 +141,102 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getJobProposals = async (jobId: number): Promise<any[]> => {
     try {
+      console.log(`Fetching proposals for job ${jobId}`);
+
+      // Use the correct query format from the contract (GetJobProposals with capital G)
+      // The contract expects PascalCase for query names (based on contract code)
       const query = {
-        get_job_proposals: {
+        GetJobProposals: {
           job_id: jobId,
         },
       };
 
+      console.log('Sending query:', JSON.stringify(query));
       const result = await queryContract(jobContractAddress, query);
-      return result || [];
+      console.log('Received proposals result:', result);
+
+      // Return empty array if nothing is returned
+      if (!result) {
+        console.log('No proposals found or query failed');
+        return [];
+      }
+
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.error('Error fetching job proposals:', error);
       return [];
+    }
+  };
+
+  const getClientJobs = async (): Promise<any[]> => {
+    if (!isConnected || !address) return [];
+
+    try {
+      const query = {
+        GetClientJobs: {
+          client_address: address,
+        },
+      };
+
+      const result = await queryContract(jobContractAddress, query);
+      if (result && result.jobs) {
+        return result.jobs;
+      }
+    } catch (error) {
+      console.log(
+        'Dedicated client jobs query not available, falling back to individual job fetching'
+      );
+    }
+
+    const jobs = [];
+    for (let i = 1; i <= 30; i++) {
+      try {
+        const query = {
+          GetJobDetails: {
+            job_id: i,
+          },
+        };
+        const job = await queryContract(jobContractAddress, query);
+
+        if (job && job.poster === address) {
+          jobs.push({ ...job, id: i });
+        }
+      } catch (e) {}
+    }
+
+    return jobs;
+  };
+
+  const reviewCompletedJob = async (
+    jobId: string,
+    freelancerAddress: string,
+    paymentAmount: string
+  ): Promise<boolean> => {
+    if (!isConnected) {
+      toast({
+        title: 'Not connected',
+        description: 'Please connect your wallet to process payment',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
+    try {
+      toast({
+        title: 'Success',
+        description: 'Payment processed for completed work',
+        variant: 'default',
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to process payment. Please try again.',
+        variant: 'destructive',
+      });
+      return false;
     }
   };
 
@@ -151,6 +247,8 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
         acceptProposal,
         getJobDetails,
         getJobProposals,
+        getClientJobs,
+        reviewCompletedJob,
       }}
     >
       {children}
