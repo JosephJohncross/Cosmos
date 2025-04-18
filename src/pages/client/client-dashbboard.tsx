@@ -38,6 +38,7 @@ import {
   TabsTrigger,
 } from '../../components/ui/tabs';
 import ProposalsList from '../../components/client/proposals-list';
+import CompletedJobs from '../../components/client/completed-jobs';
 import { useClient } from '../../context/client-context';
 
 // Job interface for better type safety
@@ -389,6 +390,7 @@ const ClientDashboard = () => {
             <TabsList>
               <TabsTrigger value='overview'>Overview</TabsTrigger>
               <TabsTrigger value='proposals'>Proposals</TabsTrigger>
+              <TabsTrigger value='completed'>Completed Jobs</TabsTrigger>
             </TabsList>
 
             <TabsContent value='overview'>
@@ -473,6 +475,32 @@ const ClientDashboard = () => {
                             acceptPayModal={confirmPayment}
                             terminateContract={terminateContractModal}
                           />
+                        </div>
+
+                        {/* Next Steps Guidance Box */}
+                        <div className='mt-4 bg-blue-50 border border-blue-100 rounded-md p-4'>
+                          <h4 className='text-blue-800 font-medium mb-2'>
+                            Next Steps After Accepting a Proposal
+                          </h4>
+                          <ul className='text-sm text-blue-700 space-y-2 list-disc pl-4'>
+                            <li>
+                              Communicate with the freelancer about your project
+                              details and expectations
+                            </li>
+                            <li>
+                              Monitor project progress in this "Active Projects"
+                              section
+                            </li>
+                            <li>
+                              Make payment when the freelancer completes their
+                              work
+                            </li>
+                          </ul>
+                          <p className='text-xs text-blue-600 mt-3 italic'>
+                            Note: The freelancer will mark the job as complete
+                            when finished. You'll be able to review the work and
+                            make payment.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -567,6 +595,12 @@ const ClientDashboard = () => {
             <TabsContent value='proposals'>
               <div className='bg-white shadow-md rounded-lg p-6 px-8'>
                 <ProposalsList />
+              </div>
+            </TabsContent>
+
+            <TabsContent value='completed'>
+              <div className='bg-white shadow-md rounded-lg p-6 px-8'>
+                <CompletedJobs />
               </div>
             </TabsContent>
           </Tabs>

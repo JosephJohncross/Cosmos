@@ -43,6 +43,7 @@ import {
   buildGetJobDetailsQuery,
   buildAcceptPaymentMsg,
   buildTerminateContractMsg,
+  buildCompleteJobMsg,
   buildGetPaymentStatusQuery,
   formatJobForDisplay,
   getJobContractAddress,
@@ -71,6 +72,7 @@ const FreelancerDashboard = () => {
   const jobDetailsBtn = useRef<HTMLDivElement>(null);
   const acceptPayModal = useRef<HTMLDivElement>(null);
   const terminateModal = useRef<HTMLDivElement>(null);
+  const completeJobModal = useRef<HTMLDivElement>(null);
   const paymentSuccessModal = useRef<HTMLDivElement>(null);
   const closeAcceptPayModal = useRef<HTMLDivElement>(null);
   const { isConnected, address, connect, executeContract, queryContract } =
@@ -112,13 +114,33 @@ const FreelancerDashboard = () => {
             const contractStatus = result.status
               ? result.status.toString()
               : 'Open';
+
+            console.log(`Job ${i} status:`, contractStatus);
+            console.log(
+              `Job ${i} assigned freelancer:`,
+              result.assigned_freelancer
+            );
+            console.log(`Current wallet address:`, address);
+
             // Map contract status values to frontend expected values
-            let normalizedStatus = contractStatus;
+            let normalizedStatus = contractStatus.toLowerCase();
             if (contractStatus === 'Open') normalizedStatus = 'open';
             if (contractStatus === 'InProgress')
               normalizedStatus = 'in_progress';
             if (contractStatus === 'Completed') normalizedStatus = 'completed';
             if (contractStatus === 'Cancelled') normalizedStatus = 'cancelled';
+
+            // Check if this job is assigned to current freelancer
+            const isAssignedToMe =
+              result.assigned_freelancer &&
+              address &&
+              result.assigned_freelancer.toString() === address.toString();
+
+            if (isAssignedToMe) {
+              console.log(
+                `Job ${i} is assigned to current freelancer with status: ${normalizedStatus}`
+              );
+            }
 
             // Ensure job has proper display properties
             const formattedJob = {
@@ -132,6 +154,9 @@ const FreelancerDashboard = () => {
               title: result.title || 'Untitled Job',
               role: result.title || 'Untitled Job',
               detail: result.description || 'No description provided',
+              assigned_freelancer: result.assigned_freelancer?.toString(),
+              freelancer_address: result.assigned_freelancer?.toString(),
+              client_address: result.poster?.toString(),
             };
 
             // Also fetch payment status if available
@@ -304,6 +329,41 @@ const FreelancerDashboard = () => {
     }
   };
 
+  const handleCompleteJob = async (jobId: string) => {
+    if (!isConnected || !address) {
+      setAuthError('Please connect first');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    setAuthError(null);
+
+    try {
+      const contractAddress = getJobContractAddress();
+      const msg = buildCompleteJobMsg(jobId);
+
+      console.log('Marking job as complete:', jobId);
+      const result = await executeContract(contractAddress, msg);
+
+      if (result) {
+        console.log('Job marked as complete:', result);
+        setTxResult(result.transactionHash);
+
+        // Refresh jobs data
+        fetchJobs();
+      } else {
+        throw new Error('Transaction failed to execute');
+      }
+    } catch (err) {
+      console.error('Error completing job:', err);
+      setAuthError(
+        err instanceof Error ? err.message : 'Failed to complete job'
+      );
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   const filteredJobs = searchTerm
     ? jobs.filter(
         (job) =>
@@ -451,28 +511,87 @@ const FreelancerDashboard = () => {
                     </div>
                   ) : (
                     <div>
+                      {/* Debug info to understand what jobs we have */}
+                      <div className='bg-gray-100 p-2 rounded-md mb-4 text-xs'>
+                        <p>Number of jobs found: {jobs.length}</p>
+                        <p>Your address: {address}</p>
+                        <p>
+                          Looking for jobs with 'in_progress' status assigned to
+                          you
+                        </p>
+                      </div>
+
                       {jobs
-                        .filter(
-                          (job) =>
-                            (job.status === 'in_progress' ||
-                              job.status === 'completed') &&
-                            job.freelancer_address === address
-                        )
+                        .filter((job) => {
+                          // Check if a job should be displayed in active contracts
+                          const isActiveStatus =
+                            job.status === 'in_progress' ||
+                            job.status === 'InProgress';
+                          const isCompletedStatus =
+                            job.status === 'completed' ||
+                            job.status === 'Completed';
+                          const isAssignedToMe =
+                            (job.freelancer_address &&
+                              job.freelancer_address === address) ||
+                            (job.assigned_freelancer &&
+                              job.assigned_freelancer === address);
+
+                          console.log(
+                            `Job ${job.id} - Status: ${job.status}, Assigned to you: ${isAssignedToMe}`
+                          );
+                          console.log(
+                            `  - freelancer_address: ${job.freelancer_address}`
+                          );
+                          console.log(
+                            `  - assigned_freelancer: ${job.assigned_freelancer}`
+                          );
+
+                          // Return true if job should be displayed
+                          return (
+                            (isActiveStatus || isCompletedStatus) &&
+                            isAssignedToMe
+                          );
+                        })
                         .map((job) => (
-                          <ProjectListingComponent
+                          <ActiveJobCard
                             key={job.id}
-                            data={job}
-                            jobDetailsModal={jobDetailsBtn}
-                            onViewDetails={() => handleViewJobDetails(job)}
+                            jobId={job.id}
+                            jobData={{
+                              title: job.title || job.role || 'Untitled Job',
+                              amount:
+                                job.budget ||
+                                job.funding?.replace(' XION', '') ||
+                                '0',
+                              duration: '1-3 weeks', // Default or get actual duration from contract
+                              status: job.status,
+                            }}
+                            terminateContract={terminateModal}
+                            completeJobModal={completeJobModal}
+                            showCompleteButton={
+                              job.status === 'in_progress' ||
+                              job.status === 'InProgress'
+                            }
                           />
                         ))}
 
-                      {jobs.filter(
-                        (job) =>
-                          (job.status === 'in_progress' ||
-                            job.status === 'completed') &&
-                          job.freelancer_address === address
-                      ).length === 0 && (
+                      {jobs.filter((job) => {
+                        const isActiveStatus =
+                          job.status === 'in_progress' ||
+                          job.status === 'InProgress';
+                        const isCompletedStatus =
+                          job.status === 'completed' ||
+                          job.status === 'Completed';
+                        const isAssignedToMe =
+                          (job.freelancer_address &&
+                            job.freelancer_address === address) ||
+                          (job.assigned_freelancer &&
+                            job.assigned_freelancer === address);
+
+                        return (
+                          (isActiveStatus || isCompletedStatus) &&
+                          isAssignedToMe
+                        );
+                      }).length === 0 && (
                         <div className='text-center py-10'>
                           <p className='text-gray-500'>
                             No active contracts found.
@@ -709,6 +828,58 @@ const FreelancerDashboard = () => {
               className='w-full mt-6 bg-[#FB822F] text-white hover:bg-[#FB822F] focus:bg-[#FB822F]'
             >
               {isProcessingPayment ? 'Processing...' : 'End Contract'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Complete Job Dialog */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <div ref={completeJobModal} className='hidden'>
+            Complete Job
+          </div>
+        </DialogTrigger>
+
+        <DialogContent className='sm:max-w-[425px] bg-white'>
+          <div className='flex flex-col items-center'>
+            <p className='text-[20px] mb-4 font-poppins font-semibold text-[#18181B] mt-5'>
+              Mark Job as Complete
+            </p>
+
+            <img
+              src='/images/client/client.png'
+              alt='client'
+              className='mb-2'
+            />
+            <span className='text-sm text-[#7E8082]'>Client</span>
+
+            <div className='flex justify-center'>
+              <span className='text-[#7E8082] font-normal font-circular text-sm text-center mt-5'>
+                Marking this job as complete will notify the client to review
+                your work and process payment.
+              </span>
+            </div>
+
+            {authError && (
+              <Alert variant='destructive' className='mt-4'>
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          <div className='mb-3 flex space-x-3'>
+            <DialogClose className='w-full'>
+              <Button className='text-white w-full mt-6 border border-gray-300 bg-white text-primary hover:bg-white focus:bg-white'>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              onClick={() => handleCompleteJob(selectedJob?.id || '1')}
+              disabled={isProcessingPayment}
+              className='w-full mt-6 bg-green-600 text-white hover:bg-green-700 focus:bg-green-700'
+            >
+              {isProcessingPayment ? 'Processing...' : 'Mark as Complete'}
             </Button>
           </div>
         </DialogContent>
