@@ -222,18 +222,45 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      toast({
-        title: 'Success',
-        description: 'Payment processed for completed work',
-        variant: 'default',
-      });
+      // Convert payment amount to integer (microunits) as required by the contract
+      const paymentAmountNum = parseFloat(paymentAmount);
+      const paymentAmountInteger = Math.round(
+        paymentAmountNum * 1000000
+      ).toString(); // Convert to XION microunits
 
-      return true;
+      console.log(
+        `Processing payment for completed job ${jobId}: ${paymentAmount} XION (${paymentAmountInteger} microunits)`
+      );
+
+      // Use the SendPayment message from contract-utils
+      const msg = {
+        SendPayment: {
+          job_id: typeof jobId === 'string' ? parseInt(jobId) : jobId,
+          freelancer_address: freelancerAddress,
+          amount: paymentAmountInteger,
+        },
+      };
+
+      const result = await executeContract(jobContractAddress, msg);
+
+      if (result) {
+        toast({
+          title: 'Success',
+          description: 'Payment processed for completed work',
+          variant: 'default',
+        });
+        return true;
+      }
+
+      return false;
     } catch (error) {
       console.error('Error processing payment:', error);
       toast({
         title: 'Error',
-        description: 'Failed to process payment. Please try again.',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to process payment. Please try again.',
         variant: 'destructive',
       });
       return false;
