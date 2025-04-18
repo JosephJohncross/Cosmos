@@ -5,7 +5,7 @@ import Dashboard from '../pages/dashboard';
 import JoinPage from '../pages/join';
 import FreelancerDasboard from '../pages/freeelancer/freelancer-dashboard';
 import FreeLancerSetupSteps from '../components/freelancer/freelancer-setup';
-import ClientDashboard from '../pages/client/client-dashbboard';
+import ClientProviderWrapper from '../pages/client/client-provider';
 import FreeLancerProviderWrapper from '../pages/freeelancer/freelancer-provider';
 import ApplyForJobPage from '../pages/freeelancer/apply-job';
 import PostAJobSteps from '../components/client/post-job';
@@ -25,7 +25,7 @@ export const CustomRoutes = () => {
         path={ApplicationRoutes.FREELANCER_SETUP}
       ></Route>
       <Route
-        element={<ClientDashboard />}
+        element={<ClientProviderWrapper />}
         path={ApplicationRoutes.CLIENT_DASHBOARD}
       ></Route>
       <Route

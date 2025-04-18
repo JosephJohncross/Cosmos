@@ -12,9 +12,12 @@ export interface Job {
   client_address: string;
   skills: string[];
   created_at?: number;
+  status?: string; // Adding status property from the contract
+  assigned_freelancer?: string; // Adding assigned_freelancer property from the contract
 }
 
 export interface FormattedJob {
+  id: string; // Adding id property to fix the TypeScript error
   applicants: string;
   detail: string;
   duration: string;
@@ -25,6 +28,9 @@ export interface FormattedJob {
   skills: string[];
   timePosted: string;
   verified: boolean;
+  status?: string;
+  freelancer_address?: string;
+  payment_status?: string;
 }
 
 export const useJobContract = () => {
@@ -175,6 +181,7 @@ export const useJobContract = () => {
     if (!jobs || jobs.length === 0) return [];
 
     return jobs.map((job) => ({
+      id: job.id, // Include the id property
       applicants: '0 to 5', // Default placeholder as this may not be in contract
       detail: job.description || 'No description provided',
       duration: job.duration || '1 - 3 weeks',
@@ -188,6 +195,8 @@ export const useJobContract = () => {
       skills: job.skills || ['General'],
       timePosted: formatTimePosted(job.created_at),
       verified: true, // All contract jobs are verified
+      status: job.status || 'open',
+      freelancer_address: job.assigned_freelancer || undefined,
     }));
   }, [jobs]);
 

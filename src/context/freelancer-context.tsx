@@ -7,11 +7,17 @@ import {
 } from 'react';
 import { useXionWallet } from './xion-context';
 import { useToast } from '../hooks/use-toast';
+import {
+  buildCompleteJobMsg,
+  getJobContractAddress,
+} from '../utils/contract-utils';
 
 type FreelancerContextProps = {
   submitJob: (jobData: any) => Promise<boolean>;
   applyForJob: (jobId: string, proposal: any) => Promise<boolean>;
   fetchFreelancerJobs: () => Promise<any[]>;
+  fetchAppliedJobs: () => Promise<any[]>;
+  completeJob: (jobId: string) => Promise<boolean>;
 };
 
 type FreelancerProviderProps = {
@@ -28,7 +34,7 @@ const FreelancerProvider = ({ children }: FreelancerProviderProps) => {
   const { toast } = useToast();
 
   // Example contract address - should be replaced with actual contract in production
-  const jobContractAddress = import.meta.env.VITE_JOB_CONTRACT_ADDRESS || '';
+  const jobContractAddress = getJobContractAddress();
 
   const submitJob = async (jobData: any): Promise<boolean> => {
     if (!isConnected) {
@@ -138,12 +144,100 @@ const FreelancerProvider = ({ children }: FreelancerProviderProps) => {
     }
   };
 
+  const fetchAppliedJobs = async (): Promise<any[]> => {
+    if (!isConnected || !address) return [];
+
+    try {
+      // Query all jobs to find those with proposals by this freelancer
+      const query = {
+        GetAllJobs: {}, // Assuming this query exists or can be implemented
+      };
+
+      // Fallback to fetch some jobs by ID if above query doesn't exist
+      let allJobs = [];
+      try {
+        const result = await queryContract(jobContractAddress, query);
+        if (result && result.jobs) {
+          allJobs = result.jobs;
+        }
+      } catch (error) {
+        console.log('Falling back to individual job fetching');
+        // Fetch first 30 jobs (adjust as needed)
+        for (let i = 1; i <= 30; i++) {
+          try {
+            const jobQuery = { GetJobDetails: { job_id: i } };
+            const job = await queryContract(jobContractAddress, jobQuery);
+            if (job) {
+              // For each job, check if it has proposals
+              const proposalsQuery = { GetJobProposals: { job_id: i } };
+              const proposals =
+                (await queryContract(jobContractAddress, proposalsQuery)) || [];
+
+              // Check if any proposal is from current freelancer
+              const hasApplied =
+                Array.isArray(proposals) &&
+                proposals.some((p) => p.freelancer === address);
+
+              if (hasApplied) {
+                allJobs.push({ ...job, id: i });
+              }
+            }
+          } catch (e) {
+            // Skip errors for non-existent jobs
+          }
+        }
+      }
+
+      return allJobs;
+    } catch (error) {
+      console.error('Error fetching applied jobs:', error);
+      return [];
+    }
+  };
+
+  const completeJob = async (jobId: string): Promise<boolean> => {
+    if (!isConnected || !address) {
+      toast({
+        title: 'Not connected',
+        description: 'Please connect your wallet to complete this job',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
+    try {
+      const msg = buildCompleteJobMsg(jobId);
+      const result = await executeContract(jobContractAddress, msg);
+
+      if (result) {
+        toast({
+          title: 'Success',
+          description: 'Job marked as completed! Awaiting client review.',
+          variant: 'default',
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error completing job:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      toast({
+        title: 'Error',
+        description: `Failed to complete job: ${errorMsg}`,
+        variant: 'destructive',
+      });
+      return false;
+    }
+  };
+
   return (
     <FreelancerContext.Provider
       value={{
         submitJob,
         applyForJob,
         fetchFreelancerJobs,
+        fetchAppliedJobs,
+        completeJob,
       }}
     >
       {children}
